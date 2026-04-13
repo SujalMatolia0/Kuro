@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background-primary: #0d1117;
+  --color-background-secondary: #161b22;
+  --color-background-tertiary: #1c2333;
+  
+  --color-accent-green: #00ff9f;
+  --color-accent-blue: #00bfff;
+  --color-accent-red: #ff6b6b;
+  --color-accent-amber: #ffa500;
+  
+  --color-border: #30363d;
+  
+  --color-text-primary: #e6edf3;
+  --color-text-muted: #7d8590;
+  
+  --color-platform-fusion: #00ff9f;
+  --color-platform-sales: #00bfff;
+  --color-platform-service: #ff6b6b;
+  --color-platform-oic: #ffa500;
+  --color-platform-bip: #a855f7;
+  --color-platform-vbs: #ec4899;
+  --color-platform-oda: #14b8a6;
+
+  --font-mono: "JetBrains Mono", "system-ui", "monospace";
+  
+  --radius-standard: 6px;
+  --radius-card: 10px;
+}
+
+@layer base {
+  body {
+    @apply bg-background-primary text-text-primary font-mono;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-background-primary px-4 py-2 rounded-standard font-bold transition-all hover:opacity-90 active:scale-95;
+  }
+
+  .card {
+    @apply bg-background-secondary border border-border rounded-card p-4 transition-all hover:border-text-muted;
+  }
+}
+
+/* Custom Scrollbar for Hacker Aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background-primary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full hover:bg-text-muted transition-colors;
+}
