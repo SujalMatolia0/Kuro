@@ -11,76 +11,167 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const email = process.argv[2];
-if (!email) {
-  console.error("Please provide your user email as an argument: npm run seed your@email.com");
-  process.exit(1);
-}
+const email = process.argv[2] || 'admin@gmail.com';
 
-const glossaryTerms = [
-  // Oracle Integration
-  { term: 'OIC', platform: 'Oracle Integration', definition: 'Oracle Integration Cloud. A cloud-based integration platform used to connect SaaS and on-premise applications.' },
-  { term: 'ESS Job', platform: 'Oracle Fusion', definition: 'Enterprise Scheduler Service. Used to run long-running background processes and reports in Oracle Cloud.' },
-  { term: 'IDCS', platform: 'OCI', definition: 'Oracle Identity Cloud Service. Provides identity management and single sign-on capabilities for Oracle Cloud applications.' },
-  { term: 'VBS', platform: 'Oracle', definition: 'Visual Builder Studio. A development platform for building and deploying web and mobile applications with Oracle Fusion Extensions.' },
-  { term: 'ORDS', platform: 'Oracle Database', definition: 'Oracle REST Data Services. A tool that makes it easy to develop REST interfaces for relational data in Oracle Database.' },
-  { term: 'HDL', platform: 'Oracle HCM', definition: 'HCM Data Loader. A powerful tool for importing massive volumes of data into Oracle HCM Cloud.' },
-  { term: 'FBL', platform: 'Oracle HCM', definition: 'File-Based Loader. A legacy data loading tool replaced by HDL, still used in some older integrations.' },
-  { term: 'POD', platform: 'Oracle Cloud', definition: 'A specific instance or environment (e.g., Dev, Test, Prod) of an Oracle Cloud application.' },
-  { term: 'OCI', platform: 'Oracle', definition: 'Oracle Cloud Infrastructure. The underlying IaaS platform that hosts Oracle SaaS and PaaS services.' },
-  { term: 'BIP', platform: 'Oracle', definition: 'BI Publisher. A reporting tool used within Oracle Fusion to generate pixel-perfect documents and reports.' },
-  { term: 'OTBI', platform: 'Oracle Fusion', definition: 'Oracle Transactional Business Intelligence. A real-time analysis tool used to query live data in Fusion apps.' },
-
-  // Salesforce
-  { term: 'Apex', platform: 'Salesforce', definition: 'A proprietary object-oriented programming language used to execute flow and transaction control statements on the Salesforce platform.' },
-  { term: 'LWC', platform: 'Salesforce', definition: 'Lightning Web Components. A modern UI framework for building performant, standard-based components on Salesforce.' },
-  { term: 'SOQL', platform: 'Salesforce', definition: 'Salesforce Object Query Language. Used to search your organization’s Salesforce data for specific information.' },
-  { term: 'Flow', platform: 'Salesforce', definition: 'A powerful automation tool that allows you to build complex business logic without writing code.' },
-  { term: 'CPQ', platform: 'Salesforce', definition: 'Configure, Price, Quote. A sales tool for companies to provide accurate pricing with any given product configuration scenario.' },
-  { term: 'Trailhead', platform: 'Salesforce', definition: 'Salesforce’s gamified learning platform for developers and users to master the platform.' },
-  
-  // General Dev
-  { term: 'REST', platform: 'General', definition: 'Representational State Transfer. An architectural style for providing standards between computer systems on the web.' },
-  { term: 'OAuth 2.0', platform: 'Security', definition: 'The industry-standard protocol for authorization and secure delegated access.' },
-  { term: 'CI/CD', platform: 'DevOps', definition: 'Continuous Integration and Continuous Deployment. A set of practices to automate software delivery.' }
-];
-
-const apiRefs = [
+const knowledgeBase = [
   {
-    title: 'HCM Workers REST API',
-    endpoint: '/hcmRestApi/resources/11.13.18.05/workers',
-    method: 'GET',
-    headers_json: { "Content-Type": "application/json", "Authorization": "Basic [CREDENTIALS]" },
-    payload_json: {},
-    platform: 'Oracle HCM'
+    title: 'Oracle Fusion Security Architecture',
+    body: {
+      type: 'doc',
+      content: [
+        { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Overview' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: 'Oracle Fusion uses RBAC (Role-Based Access Control). Roles are categorized into Job, Duty, and Abstract roles.' }] },
+        { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Job Roles' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: 'These represent the business function of a user (e.g., Accounts Payable Manager).' }] }
+      ]
+    },
+    type: 'doc',
+    platform: 'Oracle Fusion'
   },
   {
-    title: 'OIC Trigger Integration',
-    endpoint: '/ic/api/integration/v1/flows/rest/[INTEGRATION_CODE]/1.0/',
-    method: 'POST',
-    headers_json: { "Content-Type": "application/json" },
-    payload_json: { "request": "payload" },
-    platform: 'OIC'
+    title: 'OIC - Oracle Integration Cloud',
+    metadata_json: { term: 'OIC', definition: 'A cloud-based integration platform used to connect SaaS and on-premise applications.' },
+    type: 'term',
+    platform: 'Oracle'
+  },
+  {
+    title: 'SOQL - Salesforce Query Language',
+    metadata_json: { term: 'SOQL', definition: 'Salesforce Object Query Language. Used to search your organization’s Salesforce data.' },
+    type: 'term',
+    platform: 'Salesforce'
+  },
+  {
+    title: 'Production Deployment Readiness',
+    body: {
+      type: 'doc',
+      content: [
+        { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Readiness Guide' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: '1. Verify all unit tests.' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: '2. Ensure documentation is updated.' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: '3. Validate security permissions.' }] }
+      ]
+    },
+    type: 'guide',
+    platform: 'General'
   }
 ];
 
+const snippets = [
+  {
+    title: 'Oracle HCM: Active Workers',
+    code: `SELECT papf.person_number, pnf.first_name, pnf.last_name, paaf.assignment_status_type
+FROM per_all_people_f papf
+JOIN per_person_names_f pnf ON papf.person_id = pnf.person_id
+JOIN per_all_assignments_m paaf ON papf.person_id = paaf.person_id
+WHERE TRUNC(SYSDATE) BETWEEN papf.effective_start_date AND papf.effective_end_date
+  AND pnf.name_type = 'GLOBAL'
+  AND paaf.assignment_status_type = 'ACTIVE'`,
+    language: 'sql',
+    platform: 'Oracle Fusion'
+  },
+  {
+    title: 'Salesforce: Apex Trigger Boilerplate',
+    code: `trigger AccountTrigger on Account (before insert, before update, after insert, after update) {
+    if (Trigger.isBefore) {
+        if (Trigger.isInsert) {
+            // Logic for before insert
+        }
+    }
+}`,
+    language: 'java',
+    platform: 'Salesforce'
+  }
+];
+
+const checklists = [
+  {
+    title: 'Oracle Fusion POD Refresh',
+    platform: 'Oracle Fusion',
+    steps_json: [
+      { text: 'Communicate blackout period to stakeholders', completed: false },
+      { text: 'Capture manual configurations (Profile Options, etc)', completed: false },
+      { text: 'Submit Refresh Request in MyOracleSupport', completed: false },
+      { text: 'Run LDAP Synchronization after refresh', completed: false }
+    ],
+    commands_json: [
+      { label: 'Check LDAP Status', command: 'SELECT status FROM per_ldap_requests WHERE person_id = [ID]', shell: 'sql' }
+    ]
+  },
+  {
+    title: 'Salesforce Security Audit',
+    platform: 'Salesforce',
+    steps_json: [
+        { text: 'Review Profiles with "View All Data" permission', completed: false },
+        { text: 'Check External Sharing Model for sensitive objects', completed: false },
+        { text: 'Audit high-privileged users (System Admins)', completed: false }
+    ]
+  }
+];
+
+const errorDecoder = [
+  {
+    error_code: 'JBO-25058',
+    platform: 'Oracle Fusion',
+    title: 'Attribute Not Found',
+    explanation: 'The application is trying to access a field that doesn\'t exist in the current View Object context.',
+    root_cause: 'Misalignment between Data Model and UI Page mapping.',
+    fix_steps: '1. Verify Data Model\n2. Rebind UI components\n3. Clear server cache.'
+  }
+];
+
+async function clearAllTables() {
+  console.log("💣 Nuking Cloud Database...");
+  const tables = ['knowledge_base', 'snippets', 'vault_files', 'notes', 'audit_logs', 'checklists', 'error_decoder', 'permission_map', 'known_issues', 'profiles'];
+  
+  for (const table of tables) {
+    console.log(`  Cleaning ${table}...`);
+    // Use .not.is('id', null) which works for both UUID and Text PKs
+    const { error } = await supabase.from(table).delete().not('id', 'is', null);
+    if (error) {
+      console.warn(`  Warning cleaning ${table}:`, error.message);
+    }
+  }
+}
+
 async function seed() {
-  console.log(`🚀 Starting database seed for ${email}...`);
-
   try {
-    // 1. Seed Glossary
-    console.log("📝 Seeding Glossary...");
-    const glossaryData = glossaryTerms.map(t => ({ ...t, profile_email: email }));
-    const { error: gError } = await supabase.from('glossary').insert(glossaryData);
-    if (gError) throw gError;
+    await clearAllTables();
+    console.log(`🚀 Starting database seed for ${email}...`);
 
-    // 2. Seed API Refs
-    console.log("🔌 Seeding API Reference...");
-    const apiData = apiRefs.map(a => ({ ...a, profile_email: email }));
-    const { error: aError } = await supabase.from('api_references').insert(apiData);
-    if (aError) throw aError;
+    // Insert Profile (Owner)
+    console.log("👤 Seeding Profile...");
+    const { error: pError } = await supabase.from('profiles').insert([{ email: email, name: 'System Admin' }]);
+    if (pError) throw pError;
 
-    console.log("✅ Seed completed successfully!");
+    // Seed Knowledge Base
+    console.log("📝 Seeding Knowledge Base...");
+    const { error: kError } = await supabase.from('knowledge_base').insert(knowledgeBase.map(k => ({ 
+      ...k, 
+      profile_email: email,
+      category: 'General' // Default category to avoid NOT NULL constraints
+    })));
+    if (kError) throw kError;
+
+    // Seed Snippets
+    console.log("🔌 Seeding Snippets...");
+    const { error: sError } = await supabase.from('snippets').insert(snippets.map(s => ({ ...s, profile_email: email })));
+    if (sError) throw sError;
+
+    // Seed Checklists
+    console.log("✅ Seeding Checklists...");
+    const { error: cError } = await supabase.from('checklists').insert(checklists.map(c => ({ 
+      ...c, 
+      profile_email: email,
+      commands_json: JSON.stringify(c.commands_json || [])
+    })));
+    if (cError) throw cError;
+
+    // Seed Error Decoder
+    console.log("🛠 Seeding Error Decoder...");
+    const { error: eError } = await supabase.from('error_decoder').insert(errorDecoder.map(e => ({ ...e, profile_email: email })));
+    if (eError) throw eError;
+
+    console.log("✨ GLOBAL SEED COMPLETED SUCCESSFULLY!");
   } catch (err) {
     console.error("❌ Seed failed:", err);
   }
