@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, RefreshCw, LayoutGrid, List } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, RefreshCw } from 'lucide-react';
 import { useAppStore } from '../../store';
 import { instanceQueries } from '../../db/queries';
 import InstanceCard from './components/InstanceCard';

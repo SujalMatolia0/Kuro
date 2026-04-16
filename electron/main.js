@@ -1,4 +1,6 @@
 import { app, BrowserWindow, ipcMain, safeStorage, shell } from 'electron';
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
@@ -11,7 +13,7 @@ let db;
 
 function initDatabase() {
   const userDataPath = app.getPath('userData');
-  const dbPath = path.join(userDataPath, 'dev_companion_production.sqlite');
+  const dbPath = path.join(userDataPath, 'kuro_production.sqlite');
   
   try {
     db = new Database(dbPath);
@@ -22,6 +24,8 @@ function initDatabase() {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         color TEXT NOT NULL,
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
         created_at INTEGER
       );
 
@@ -34,6 +38,8 @@ function initDatabase() {
         type TEXT NOT NULL,
         expiry_date INTEGER,
         notes TEXT,
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
         created_at INTEGER,
         FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
       );
@@ -53,6 +59,9 @@ function initDatabase() {
         status TEXT NOT NULL,
         priority TEXT NOT NULL,
         position INTEGER,
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
+        cloud_updated_at INTEGER,
         created_at INTEGER,
         FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
       );
@@ -62,10 +71,102 @@ function initDatabase() {
         workspace_id TEXT,
         title TEXT NOT NULL,
         body TEXT,
+        group_name TEXT,
         updated_at INTEGER,
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
+        cloud_updated_at INTEGER,
+        FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
+      );
+
+      CREATE TABLE IF NOT EXISTS audit_logs (
+        id TEXT PRIMARY KEY,
+        user_email TEXT,
+        action TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        workspace_id TEXT,
+        diff_json TEXT, -- Store character-level diffs
+        created_at INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS local_snippets (
+        id TEXT PRIMARY KEY,
+        workspace_id TEXT,
+        title TEXT NOT NULL,
+        code TEXT NOT NULL,
+        language TEXT NOT NULL,
+        platform TEXT NOT NULL,
+        tags TEXT, -- Comma separated
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
+        cloud_updated_at INTEGER,
+        created_at INTEGER,
+        FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
+      );
+
+      CREATE TABLE IF NOT EXISTS local_vault_files (
+        id TEXT PRIMARY KEY,
+        workspace_id TEXT,
+        name TEXT NOT NULL,
+        content TEXT, -- Preview or summary
+        storage_path TEXT, -- Local path if downloaded, or cloud reference
+        filetype TEXT,
+        platform TEXT,
+        description TEXT,
+        version_note TEXT,
+        is_synced INTEGER DEFAULT 0,
+        cloud_id TEXT,
+        cloud_updated_at INTEGER,
+        created_at INTEGER,
         FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
       );
     `);
+
+    // --- MIGRATIONS (Adding columns to existing tables if they don't exist) ---
+    // Note: better-sqlite3 doesn't support 'IF NOT EXISTS' for ADD COLUMN, 
+    // so we wrap in try-catch to ignore 'duplicate column' errors.
+    const migrations = [
+      'ALTER TABLE workspaces ADD COLUMN is_synced INTEGER DEFAULT 0',
+      'ALTER TABLE workspaces ADD COLUMN cloud_id TEXT',
+      'ALTER TABLE instances ADD COLUMN is_synced INTEGER DEFAULT 0',
+      'ALTER TABLE instances ADD COLUMN cloud_id TEXT',
+      'ALTER TABLE tasks ADD COLUMN is_synced INTEGER DEFAULT 0',
+      'ALTER TABLE tasks ADD COLUMN cloud_id TEXT',
+      'ALTER TABLE tasks ADD COLUMN cloud_updated_at INTEGER',
+      'ALTER TABLE tasks ADD COLUMN instance_id TEXT',
+      'ALTER TABLE notes ADD COLUMN is_synced INTEGER DEFAULT 0',
+      'ALTER TABLE notes ADD COLUMN cloud_id TEXT',
+      'ALTER TABLE notes ADD COLUMN cloud_updated_at INTEGER',
+      'ALTER TABLE notes ADD COLUMN group_name TEXT',
+      'ALTER TABLE local_snippets ADD COLUMN type TEXT DEFAULT "snippet"',
+    ];
+
+    for (const sql of migrations) {
+      try { db.exec(sql); } catch (e) { /* ignore duplicate column errors */ }
+    }
+
+    // Create Phase 6 tables (idempotent)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS nav_layout (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        layout_json TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS ai_history (
+        id TEXT PRIMARY KEY,
+        module TEXT NOT NULL,
+        query TEXT NOT NULL,
+        platform TEXT,
+        response TEXT NOT NULL,
+        created_at INTEGER
+      );
+    `);
+
     console.log('Tables initialized successfully');
   } catch (err) {
     console.error('DATABASE INITIALIZATION ERROR:', err);
@@ -73,22 +174,49 @@ function initDatabase() {
 }
 
 function createWindow() {
+  const iconPath = process.env.NODE_ENV === 'development' 
+    ? path.join(__dirname, '../public/logo.png')
+    : path.join(__dirname, '../dist/logo.png');
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1280,
+    height: 820,
+    minWidth: 900,
+    minHeight: 600,
+    title: 'Kuro',
+    icon: iconPath,
     backgroundColor: '#0d1117',
+    frame: true,
+    autoHideMenuBar: true,   // hides the File/Edit/View menu bar
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
+      devTools: process.env.NODE_ENV === 'development', // no devtools in production
       preload: path.join(__dirname, 'preload.js'),
     },
   });
 
+  // Remove the default menu entirely and harden in production
+  if (process.env.NODE_ENV !== 'development') {
+    mainWindow.setMenu(null);
+    
+    // Disable right-click context menu
+    mainWindow.webContents.on('context-menu', (e) => e.preventDefault());
+
+    // Disable DevTools shortcuts (Ctrl+Shift+I, F12)
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if ((input.control && input.shift && input.key.toLowerCase() === 'i') || input.key === 'F12') {
+        event.preventDefault();
+      }
+    });
+  }
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
+    mainWindow.focus();
   } else {
+    // Use loadFile with relative path — fixes ERR_FILE_NOT_FOUND for assets
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
@@ -100,6 +228,14 @@ function createWindow() {
 app.whenReady().then(() => {
   initDatabase();
   createWindow();
+
+  // Auto-Updater (production only)
+  if (process.env.NODE_ENV !== 'development') {
+    autoUpdater.logger = console;
+    autoUpdater.checkForUpdatesAndNotify().catch(err => {
+      console.log('Auto-update check skipped:', err.message);
+    });
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

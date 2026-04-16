@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../../store';
-import { ChevronRight, ChevronLeft, Rocket, Shield, User, Layout, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Rocket, Shield, User, Layout, CheckCircle2, RefreshCw } from 'lucide-react';
+import { cloudProfileQueries } from '../../db/cloudQueries';
+import { pullCloudData } from '../../utils/dataMigration';
+import { workspaceQueries } from '../../db/queries';
 
 const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(1);
-  const { profile, settings, updateProfile, updateSettings } = useAppStore();
+  const { profile, updateProfile, updateSettings } = useAppStore();
   
   // Local state for setup
   const [name, setName] = useState(profile.name || '');
@@ -13,6 +16,8 @@ const OnboardingWizard: React.FC = () => {
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [error, setError] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
 
   const hashPin = async (input: string) => {
     const msgBuffer = new TextEncoder().encode(input);
@@ -46,9 +51,34 @@ const OnboardingWizard: React.FC = () => {
   };
 
   const handleFinish = async () => {
+    setIsSyncing(true);
+    setSyncMessage('Securing profile...');
     const pinHash = await hashPin(pin);
     updateProfile({ name, email, focus });
-    updateSettings({ pinHash, isOnboarded: true });
+    updateSettings({ pinHash });
+    
+    // Sync profile to Supabase to enable cloud capabilities
+    setSyncMessage('Connecting to Cloud...');
+    await cloudProfileQueries.syncProfile({ name, email, focus });
+
+    // Ensure we fetch user's cloud data to Local DB
+    setSyncMessage('Downloading cloud data...');
+    try {
+      await pullCloudData(email);
+    } catch (e) {
+      console.error('Error auto-syncing during onboarding', e);
+    }
+
+    // Refresh workspaces array just in case step 1 created the Default Workspace
+    const localWorkspaces = await workspaceQueries.getAll();
+    const store = useAppStore.getState();
+    store.setWorkspaces(localWorkspaces);
+    if (!store.activeWorkspace && localWorkspaces.length > 0) {
+      store.setActiveWorkspace(localWorkspaces[0]);
+    }
+
+    setSyncMessage('Ready!');
+    updateSettings({ isOnboarded: true });
   };
 
   const renderStep = () => {
@@ -221,10 +251,11 @@ const OnboardingWizard: React.FC = () => {
           ) : (
             <button 
               onClick={handleFinish}
-              className="w-full btn-primary py-4 flex items-center justify-center gap-2 text-base font-black uppercase tracking-widest animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300"
+              disabled={isSyncing}
+              className="w-full btn-primary py-4 flex items-center justify-center gap-2 text-base font-black uppercase tracking-widest animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300 disabled:opacity-80"
             >
-              <Rocket size={24} />
-              <span>Enter Workspace</span>
+              {isSyncing ? <RefreshCw size={24} className="animate-spin" /> : <Rocket size={24} />}
+              <span>{isSyncing ? syncMessage : 'Enter Workspace'}</span>
             </button>
           )}
         </div>

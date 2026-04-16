@@ -34,10 +34,13 @@ interface AppState {
   // Settings
   settings: {
     preferredBrowser: string;
-    theme: 'dark';
+    theme: 'dark' | 'light';
     aiProvider: string;
     pinHash?: string; 
     isOnboarded?: boolean;
+    openaiKey?: string;
+    anthropicKey?: string;
+    groqKey?: string;
   };
   profile: {
     name: string;
@@ -67,7 +70,7 @@ export const useAppStore = create<AppState>()(
       settings: {
         preferredBrowser: 'Default System Browser',
         theme: 'dark',
-        aiProvider: 'gemini',
+        aiProvider: 'groq',
         isOnboarded: false,
       },
       profile: {
@@ -83,7 +86,7 @@ export const useAppStore = create<AppState>()(
       })),
     }),
     {
-      name: 'dev-companion-storage',
+      name: 'kuro-storage',
       partialize: (state) => ({
         settings: state.settings,
         profile: state.profile,
