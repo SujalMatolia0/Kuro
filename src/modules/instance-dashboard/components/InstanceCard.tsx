@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Clock, Shield, AlertTriangle, CheckCircle2, MoreVertical, Key, Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { ExternalLink, Clock, Key, Copy, EyeOff, Trash2 } from 'lucide-react';
 import { useAppStore } from '../../../store';
 import { instanceQueries } from '../../../db/queries';
 import PinModal from '../../../components/PinModal';
@@ -11,7 +11,7 @@ interface InstanceCardProps {
 }
 
 const InstanceCard: React.FC<InstanceCardProps> = ({ instance, onUpdate, refreshKey }) => {
-  const { settings, isUnlocked } = useAppStore();
+  const { isUnlocked } = useAppStore();
   const [status, setStatus] = useState<'checking' | 'active' | 'unreachable' | 'expired'>('checking');
   const [creds, setCreds] = useState<{username?: string, password?: string} | null>(null);
   const [showCreds, setShowCreds] = useState(false);
@@ -222,6 +222,5 @@ const InstanceCard: React.FC<InstanceCardProps> = ({ instance, onUpdate, refresh
   );
 };
 
-import { RefreshCw } from 'lucide-react';
 
 export default InstanceCard;

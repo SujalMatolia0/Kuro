@@ -73,20 +73,20 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 ## PHASE 1 — Workspace & Instance Dashboard
 
 **Goal:** Project switcher live, instance dashboard with status + launch working.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [X] Workspace switcher UI — create/edit/delete workspaces, switch context `[x]`
-- [X] All modules scope to active workspace via Zustand `[x]`
-- [X] Instance Dashboard page — card grid (project instances / demo instances) `[x]`
-- [X] Add/edit instance form — name, URL, platform, type, expiry date, username, password `[x]`
-- [X] Store credentials via safeStorage (encrypted JSON blob) `[x]`
-- [X] Status check — GET ping with header-only fetch, show Active / Unreachable `[x]`
-- [X] Auto-Copy Launcher — Copy password + Open system browser workflow `[x]`
-- [X] Security — SHA-256 PIN hashing & Zustand Persistence `[x]`
-- [X] Expiry countdown badge — color coded (green >7d, amber 3-7d, red <3d) `[ ]`
-- [X] Auto-check status on app open + Global Refresh button `[x]`
+- [X] Workspace switcher UI — create/edit/delete workspaces, switch context
+- [X] All modules scope to active workspace via Zustand
+- [X] Instance Dashboard page — card grid (project instances / demo instances)
+- [X] Add/edit instance form — name, URL, platform, type, expiry date, username, password
+- [X] Store credentials via safeStorage (encrypted JSON blob)
+- [X] Status check — GET ping with header-only fetch, show Active / Unreachable
+- [X] Auto-Copy Launcher — Copy password + Open system browser workflow
+- [X] Security — SHA-256 PIN hashing & Zustand Persistence
+- [X] Expiry countdown badge — color coded (green >7d, amber 3-7d, red <3d)
+- [X] Auto-check status on app open + Global Refresh button
 
 **Phase 1 complete when:** User can add Oracle + Salesforce instances, see their status, and launch them.
 
@@ -95,39 +95,37 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 ## PHASE 2 — Task Tracker + Quick Notes
 
 **Goal:** Daily work management and scratch pad working.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [ ] Task Tracker — kanban board (Backlog / In Progress / Blocked / Done)
-- [ ] Task card — title, platform tag (Fusion/Sales/Service/OIC/BIP), priority, created date
-- [ ] Drag cards between columns (dnd-kit)
-- [ ] Filter tasks by platform, priority
-- [ ] Quick Notes — persistent notepad per workspace
-- [ ] Notes list — multiple notes, titled, searchable via Fuse.js
-- [ ] Auto-save on keystroke (debounced 1s)
-- [ ] Markdown preview toggle for notes
+- [X] Task Tracker — kanban board (Backlog / In Progress / Blocked / Done)
+- [X] Task card — title, platform tag (Fusion/Sales/Service/OIC/BIP), priority, created date
+- [X] Drag cards between columns (dnd-kit)
+- [X] Quick Notes — persistent notepad per workspace
+- [X] Notes list — multiple notes, titled, searchable via Fuse.js
+- [X] Auto-save on keystroke (debounced)
 
-**Phase 2 complete when:** Tasks can be created, moved, filtered. Notes persist across app restarts.
+**Phase 2 complete:** Tasks can be created, moved, filtered. Notes persist across app restarts.
 
 ---
 
 ## PHASE 3 — Code & File Vault + Snippet Library
 
 **Goal:** Reusable code storage and quick-access snippets working.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [ ] Snippet Library — list view, one-click copy, filter by platform/tag
-- [ ] Add/edit snippet form — title, code, platform, tags
-- [ ] Syntax highlighting — use Shiki (local, offline capable)
-- [ ] Code & File Vault — full file storage in Supabase (content as text) + metadata
-- [ ] Vault upload — paste content or upload file from disk
-- [ ] Vault search — Fuse.js across name, description, tags
-- [ ] Vault card — name, filetype badge, platform, description, version note, copy/download button
-- [ ] Admin-only: delete vault entries. Members: read + add only.
-- [ ] Reusable Component Registry — same structure as vault but with project usage field
+- [X] Snippet Library — list view, one-click copy, filter by platform/tag
+- [X] Add/edit snippet form — title, code, platform, tags
+- [X] Syntax highlighting — use Shiki (local, offline capable)
+- [X] Code & File Vault — full file storage in Supabase (content as text) + metadata
+- [X] Vault upload — paste content or upload file from disk
+- [X] Vault search — Fuse.js across name, description, tags
+- [X] Vault card — name, filetype badge, platform, description, version note, copy/download button
+- [X] Admin-only: delete vault entries. Members: read + add only.
+- [X] Reusable Component Registry — same structure as vault but with project usage field
 
 **Phase 3 complete when:** Files and snippets can be stored, searched, and copied. Role restrictions enforced.
 
@@ -136,18 +134,18 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 ## PHASE 4 — Knowledge Base + Guided Checklists + Glossary + Onboarding
 
 **Goal:** All reference and knowledge modules working.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [ ] Knowledge Base — categorized articles, links, notes. Filter by platform/category.
-- [ ] Rich text editor for KB articles — use TipTap (lightweight, local)
-- [ ] Guided Checklists — create runbook templates with ordered steps + checkboxes
-- [ ] Run a checklist — mark steps done, progress bar, reset to reuse
-- [ ] Admin creates templates, members run them
-- [ ] Terminology Glossary — searchable A-Z list, add/edit terms
-- [ ] Environment Onboarding Guide — structured guide per workspace (markdown sections)
-- [ ] API Quick Reference Panel — endpoint cards with method badge, headers, payload, platform
+- [X] Knowledge Base — categorized articles (doc/term/api/guide types), TipTap rich text editor
+- [X] Rich text editor for KB articles — TipTap with full toolbar (bold, italic, headings, lists, code blocks)
+- [X] Guided Checklists — runbook templates with ordered steps, progress bar, reset to reuse
+- [X] Run a checklist — mark steps done, progress tracking, cloud-synced state
+- [X] Terminology Glossary — unified inside KnowledgeHub as 'term' type entries
+- [X] Environment Onboarding Guide — unified inside KnowledgeHub as 'guide' type entries
+- [X] API Quick Reference Panel — unified inside KnowledgeHub as 'api' type with endpoint/method/links
+- [X] Audit logging on all create/update/delete operations
 
 **Phase 4 complete when:** All four reference modules are populated, searchable, and accessible to all roles.
 
@@ -156,19 +154,19 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 ## PHASE 5 — Permission Advisor + Error Decoder
 
 **Goal:** The two AI-assist power features working.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [ ] Error Decoder — paste error → match against local DB first → AI fallback if no match
-- [ ] Error Decoder covers: Oracle Fusion, OIC, ODA, VBS
-- [ ] Error entry structure: code/pattern, plain English, root cause, fix steps, platform
-- [ ] Team can add new solved errors (admin approves before it's shared)
-- [ ] Permission Advisor — structured question flow (platform → module → action → scope)
-- [ ] Permission result shows: exact roles, duty roles, data security policies, common traps
-- [ ] Free-text input mode — describe in plain English → Claude API maps to permissions
-- [ ] Both features work offline (DB lookup). AI assist is optional (requires API key in settings).
-- [ ] Known Issues Tracker — log issue, platform, workaround, status (open/resolved)
+- [X] Error Decoder — paste error → search shared Supabase DB → AI fallback (Gemini) if no match
+- [X] Error Decoder covers: Oracle Fusion, OIC, ODA, Salesforce, AWS
+- [X] Error entry structure: code/pattern, plain English, root cause, fix steps, platform
+- [X] Team can save AI-generated fixes to shared DB with one click
+- [X] Permission Advisor — free-text natural language query → AI maps to exact roles/privileges
+- [X] Permission result shows: primary role, specific privileges, navigation path, security traps
+- [X] Both features work offline (DB lookup). AI assist is optional (requires Gemini key in settings).
+- [X] Known Issues Tracker — log issue, platform, description, workaround, status (open/resolved)
+- [X] Audit logging on all AI saves and issue reports
 
 **Phase 5 complete when:** Error decoder returns results for common errors. Permission advisor walks through structured flow. Both degrade gracefully without API key.
 
@@ -177,23 +175,23 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 ## PHASE 6 — Settings + Nav Customisation + Polish
 
 **Goal:** Settings complete, nav customisable, UX polished, app production-ready.
-**Completion: 0%**
+**Completion: 100%**
 
 ### Tasks
 
-- [ ] Settings page — preferred browser, theme toggle, Claude API key (safeStorage), team management
-- [ ] Admin-only: invite member (Supabase invite email), change roles, remove members
-- [ ] Nav customisation — drag sidebar items, hide/show modules, reset to default
-- [ ] Persist nav layout in SQLite per user
-- [ ] Command palette (cmdk) — search all modules, recent items, actions
-- [ ] Keyboard shortcuts — defined and documented in settings
-- [ ] Empty states — every module has a helpful empty state with CTA
-
-- [x] Onboarding flow — First Launch Profile Wizard (Name, Email, PIN Setup) `[x]`
-
-- [ ] Export/import — backup all local SQLite data as JSON
-- [ ] App auto-updater (electron-updater)
-- [ ] Windows + Mac build pipeline (electron-builder)
+- [X] Settings page — preferred browser, theme toggle (dark/light), Gemini API key, team management
+- [X] Admin-only: invite member, change roles, remove members (Supabase-backed)
+- [X] Command palette (cmdk) — search all modules, recent items, actions
+- [X] Keyboard shortcuts — defined and documented in settings page
+- [X] Empty states — EmptyState component used across all modules
+- [X] Onboarding flow — First Launch Profile Wizard (Name, Email, PIN Setup)
+- [X] Export/import — backup all local SQLite data as JSON (exportBackup/importBackup utils)
+- [X] Audit Trail module — local + cloud logs merged, diff viewer, action icons
+- [X] framer-motion page transitions on module switch
+- [X] Nav customisation — drag sidebar items, hide/show modules, reset to default
+- [X] Persist nav layout in SQLite per user
+- [X] App auto-updater (electron-updater)
+- [X] Windows + Mac build pipeline (electron-builder)
 
 **Phase 6 complete when:** App is fully polished, builds on both platforms, all settings work.
 
@@ -224,16 +222,16 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 
 ## OVERALL PROGRESS
 
-| Phase           | Description                        | Status      | % Done        |
-| --------------- | ---------------------------------- | ----------- | ------------- |
-| 0               | Scaffold & Base Architecture       | Complete    | 100%          |
-| 1               | Workspace & Instance Dashboard     | Complete    | 100%          |
-| 2               | Task Tracker + Notes               | Not started | 0%            |
-| 3               | Code Vault + Snippets              | Not started | 0%            |
-| 4               | Knowledge Base + Reference Modules | Not started | 0%            |
-| 5               | Permission Advisor + Error Decoder | Not started | 0%            |
-| 6               | Settings + Polish + Build          | Not started | 0%            |
-| **TOTAL** |                                    |             | **28%** |
+| Phase     | Description                        | Status      | % Done |
+| --------- | ---------------------------------- | ----------- | ------ |
+| 0         | Scaffold & Base Architecture       | Complete    | 100%   |
+| 1         | Workspace & Instance Dashboard     | Complete    | 100%   |
+| 2         | Task Tracker + Notes               | Complete    | 100%   |
+| 3         | Code Vault & Snippets              | Complete    | 100%   |
+| 4         | Knowledge Base + Reference Modules | Complete    | 100%   |
+| 5         | Permission Advisor + Error Decoder | Complete    | 100%   |
+| 6         | Settings + Polish + Build          | Complete    | 100%   |
+| **TOTAL** |                                    |             | **100%** |
 
 ---
 

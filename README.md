@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# Kuro - Enterprise AI Dev Companion
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Kuro is a high-performance productivity hub designed for enterprise architects and developers working with complex ecosystems like Oracle Fusion and Salesforce. It combines local data persistence with low-latency AI intelligence to provide real-time security mapping, error diagnostics, and knowledge management.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **AI Synthesis Engine**: Powered by **Groq (Llama 3.3)** for near-instant response times.
+- **Security & RBAC Mapping**: Specialized logic for Oracle JOB/DUTY roles and Salesforce Permission Sets with direct Security Console references.
+- **Local-First Architecture**: High-speed local SQLite database with optional cloud synchronization (Supabase).
+- **Glassmorphism UI**: High-fidelity, modern interface with interactive markdown rendering and actionable code blocks.
+- **Enterprise Modules**:
+  - **Error Decoder**: Real-time diagnostic engine for complex platform logs.
+  - **Permission Advisor**: Security mapping with official documentation verification.
+  - **Knowledge Hub**: Team-shared wiki for enterprise standards and runbooks.
+  - **Task Tracker**: High-performance Kanban board integrated with your workspace.
 
-## React Compiler
+## 🛠 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 19, Vite, Tailwind CSS (v4), Framer Motion.
+- **Shell**: Electron (v34) for native desktop integration.
+- **Storage**: SQLite (`better-sqlite3`), Zustand with persistence.
+- **AI**: Groq API integration (`llama-3.3-70b-versatile`).
 
-## Expanding the ESLint configuration
+## 📁 Documentation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Detailed documentation has been consolidated into the `/docs` folder:
+- [Build Instructions](docs/BUILD_INSTRUCTIONS.md)
+- [Deployment Checklist](docs/DEPLOYMENT_CHECKLIST.md)
+- [Project Roadmap](docs/PLAN.md)
+- [Release Notes](docs/RELEASE_NOTES.md)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🏁 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone the repo**
+2. **Install dependencies**: `npm install`
+3. **Setup environment**: Rename `.env.example` to `.env` and add your `VITE_GROQ_API_KEY`.
+4. **Run development mode**: `npm run dev`
+5. **Build for production**: `npm run build`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🔒 Security
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Kuro uses Electron's `safeStorage` for any sensitive API credentials stored locally. Audit logging is enabled by default to track all critical database mutations.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+*Built for architects who demand high-fidelity tools.*

@@ -1,36 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  DndContext, 
-  DragOverlay, 
-  closestCorners, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors,
-  DragStartEvent,
-  DragOverEvent,
-  DragEndEvent,
-  defaultDropAnimationSideEffects
+import { useState, useEffect } from 'react';
+import {
+  DndContext, DragOverlay, closestCorners,
+  KeyboardSensor, PointerSensor, useSensor, useSensors,
+  defaultDropAnimationSideEffects,
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useAppStore } from '../../store';
-import { taskQueries } from '../../db/queries';
+import { taskQueries, instanceQueries } from '../../db/queries';
 import KanbanColumn from './components/KanbanColumn';
+import { Plus, Filter, Search, Server } from 'lucide-react';
 import TaskCard from './components/TaskCard';
-import { Plus, Filter, Search } from 'lucide-react';
-
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'BLOCKED' | 'DONE';
-
-export interface Task {
-  id: string;
-  workspace_id: string;
-  title: string;
-  platform: string;
-  status: TaskStatus;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  position: number;
-  created_at: number;
-}
+import Modal from '../../components/Modal';
+import type { TaskStatus, Task } from './types';
 
 const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
   { id: 'TODO', label: 'Backlog', color: 'border-white/10' },
@@ -42,17 +23,29 @@ const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
 const TaskTracker = () => {
   const { activeWorkspace } = useAppStore();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [instances, setInstances] = useState<{ id: string; name: string; url: string }[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // New task modal state
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('TODO');
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskPlatform, setNewTaskPlatform] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
+  const [newTaskInstanceId, setNewTaskInstanceId] = useState<string>('');
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   useEffect(() => {
     if (activeWorkspace) {
       loadTasks();
+      loadInstances();
     }
   }, [activeWorkspace]);
 
@@ -62,26 +55,43 @@ const TaskTracker = () => {
     setTasks(list);
   };
 
-  const handleCreateTask = async (status: TaskStatus = 'TODO') => {
+  const loadInstances = async () => {
     if (!activeWorkspace) return;
+    const list = await instanceQueries.getByWorkspace(activeWorkspace.id);
+    setInstances(list.map((i: any) => ({ id: i.id, name: i.name, url: i.url })));
+  };
+
+  const handleOpenTaskModal = (status: TaskStatus = 'IN_PROGRESS') => {
+    setNewTaskStatus(status);
+    setNewTaskTitle('');
+    setNewTaskPlatform('General');
+    setNewTaskPriority('medium');
+    setNewTaskInstanceId('');
+    setIsNewTaskModalOpen(true);
+  };
+
+  const handleSaveNewTask = async () => {
+    if (!activeWorkspace || !newTaskTitle.trim()) return;
     const newTask = {
       workspaceId: activeWorkspace.id,
-      title: 'New Task',
-      platform: 'general',
-      status,
-      priority: 'medium',
-      position: tasks.filter(t => t.status === status).length
+      title: newTaskTitle.trim(),
+      platform: newTaskPlatform.trim() || 'General',
+      status: newTaskStatus,
+      priority: newTaskPriority,
+      position: tasks.filter(t => t.status === newTaskStatus).length,
+      instance_id: newTaskInstanceId || null,
     };
     await taskQueries.create(newTask);
+    setIsNewTaskModalOpen(false);
     loadTasks();
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = (event) => {
     const { active } = event;
-    setActiveTask(tasks.find(t => t.id === active.id) || null);
+    setActiveTask(tasks.find((t) => t.id === active.id) || null);
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = (event) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -122,23 +132,24 @@ const TaskTracker = () => {
     }
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = async (event) => {
     setActiveTask(null);
     const { active, over } = event;
     if (!over) return;
 
     const activeId = active.id;
-    const overId = over.id;
 
-    const activeTask = tasks.find(t => t.id === activeId);
+    const activeTask = tasks.find((t) => t.id === activeId);
     if (!activeTask) return;
 
     // Update status in DB
-    await taskQueries.update(activeTask.id, { 
+    await taskQueries.update(activeTask.id, {
       status: activeTask.status,
-      position: tasks.filter(t => t.status === activeTask.status).indexOf(activeTask)
+      position: tasks
+        .filter((t) => t.status === activeTask.status)
+        .indexOf(activeTask),
     });
-    
+
     loadTasks(); // Final sync with DB
   };
 
@@ -146,15 +157,17 @@ const TaskTracker = () => {
     <div className="h-[calc(100vh-140px)] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-black tracking-tighter text-accent-green uppercase">Task Tracker</h1>
+          <h1 className="text-2xl font-black tracking-tighter text-accent-green uppercase">
+            Task Tracker
+          </h1>
           <div className="flex items-center gap-2 bg-background-secondary border border-border rounded-full px-3 py-1">
-             <Search size={12} className="text-text-muted" />
-             <input 
-               placeholder="Search tasks..." 
-               className="bg-transparent border-none text-[10px] font-bold focus:outline-none w-32 placeholder:uppercase"
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-             />
+            <Search size={12} className="text-text-muted" />
+            <input
+              placeholder="Search tasks..."
+              className="bg-transparent border-none text-[10px] font-bold focus:outline-none w-32 placeholder:uppercase"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -162,8 +175,8 @@ const TaskTracker = () => {
             <Filter size={14} />
             <span>Filter</span>
           </button>
-          <button 
-            onClick={() => handleCreateTask()}
+          <button
+            onClick={() => handleOpenTaskModal()}
             className="btn-primary py-2 px-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
           >
             <Plus size={16} />
@@ -182,34 +195,111 @@ const TaskTracker = () => {
         >
           <div className="flex gap-6 h-full min-w-max pr-6">
             {COLUMNS.map((col) => (
-              <KanbanColumn 
-                key={col.id} 
-                column={col} 
-                tasks={tasks.filter(t => t.status === col.id && (t.title.toLowerCase().includes(searchQuery.toLowerCase())))}
-                onAddTask={() => handleCreateTask(col.id)}
+              <KanbanColumn
+                key={col.id}
+                column={col}
+                tasks={tasks.filter(
+                  (t) =>
+                    t.status === col.id &&
+                    t.title.toLowerCase().includes(searchQuery.toLowerCase()),
+                )}
+                onAddTask={() => handleOpenTaskModal(col.id)}
                 onDeleteTask={async (id) => {
                   await taskQueries.delete(id);
                   loadTasks();
                 }}
+                instances={instances}
               />
             ))}
           </div>
 
-          <DragOverlay dropAnimation={{
-            sideEffects: defaultDropAnimationSideEffects({
-              styles: {
-                active: {
-                  opacity: '0.5',
+          <DragOverlay
+            dropAnimation={{
+              sideEffects: defaultDropAnimationSideEffects({
+                styles: {
+                  active: {
+                    opacity: '0.5',
+                  },
                 },
-              },
-            }),
-          }}>
-            {activeTask ? (
-              <TaskCard task={activeTask} isOverlay />
-            ) : null}
+              }),
+            }}
+          >
+            {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
           </DragOverlay>
         </DndContext>
       </div>
+
+      <Modal
+        isOpen={isNewTaskModalOpen}
+        onClose={() => setIsNewTaskModalOpen(false)}
+        title="CREATE NEW TASK"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Task Title</label>
+            <input
+              autoFocus
+              className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+              placeholder="e.g. Debug SSO integration"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveNewTask()}
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Platform</label>
+              <input
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                placeholder="e.g. Fusion, OIC, Web"
+                value={newTaskPlatform}
+                onChange={(e) => setNewTaskPlatform(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveNewTask()}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Priority</label>
+              <select
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                value={newTaskPriority}
+                onChange={(e) => setNewTaskPriority(e.target.value as any)}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          {instances.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                <Server size={11} /> Link to Instance (optional)
+              </label>
+              <select
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                value={newTaskInstanceId}
+                onChange={e => setNewTaskInstanceId(e.target.value)}
+              >
+                <option value="">— No instance —</option>
+                {instances.map(inst => (
+                  <option key={inst.id} value={inst.id}>{inst.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <button
+            onClick={handleSaveNewTask}
+            disabled={!newTaskTitle.trim()}
+            className="w-full btn-primary py-3 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            CREATE TASK
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
