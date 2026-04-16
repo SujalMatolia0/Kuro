@@ -70,7 +70,13 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
-    "publish": null
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "SujalMatolia0",
+        "repo": "Dev-Companion"
+      }
+    ]
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
