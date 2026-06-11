@@ -103,16 +103,13 @@ export function Taskbar() {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            fontWeight: 900,
-            fontSize: 13,
-            color: 'var(--copper)',
-            textShadow: '0 0 8px rgba(181,101,29,0.3)',
             transition: 'background 0.15s, transform 0.1s',
+            overflow: 'hidden',
           }}
           onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
           onMouseLeave={e => (e.currentTarget.style.transform = '')}
         >
-          K
+          <img src="/logo.png" alt="K" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
 
         {/* Separator */}

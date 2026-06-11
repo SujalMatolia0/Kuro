@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, Mail, Lock, Chrome, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
+import { Mail, Lock, Chrome, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
 import { signInWithEmail, signUpWithEmail, signInWithGoogle, signInAsGuest } from '../lib/auth';
 
 interface LoginPageProps {
@@ -55,9 +55,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onAuthSuccess }) => {
 
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent-green/10 flex items-center justify-center">
-            <LogIn size={32} className="text-accent-green" />
-          </div>
+          <img src="/logo.png" alt="Kuro Logo" className="w-20 h-20 mx-auto mb-4 object-contain rounded-2xl shadow-lg shadow-black/50 border border-border/30" />
           <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">Kuro</h1>
           <p className="text-text-muted text-sm">Sign in to your workspace</p>
         </div>
