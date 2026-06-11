@@ -59,12 +59,7 @@ const MODULES: ModuleDef[] = [
   { id: 'settings',            label: 'Settings',             icon: Settings,     group: 'System',       keywords: 'settings preferences api keys theme' },
 ];
 
-// Map old content-search module references to correct ModuleIds
-const CONTENT_MODULE_MAP: Record<string, ModuleId> = {
-  'notes':        'notes',
-  'code-library': 'snippets',
-  'knowledge-hub': 'knowledge',
-};
+
 
 interface ContentResult {
   id: string;

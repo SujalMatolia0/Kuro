@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useWindowStore, MODULE_META } from '../store/windowStore';
-import type { ModuleId } from '../store/windowStore';
 import { Launcher } from './Launcher';
 import { useAppStore } from '../store';
 import { sfx } from '../lib/sfx';

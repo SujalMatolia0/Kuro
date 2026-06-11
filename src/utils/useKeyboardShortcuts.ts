@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
-import { useAppStore } from '../store';
+import { useWindowStore } from '../store/windowStore';
+import type { ModuleId } from '../store/windowStore';
 
-const MODULE_ORDER = [
-  'instance-dashboard',
-  'task-tracker',
+const MODULE_ORDER: ModuleId[] = [
+  'instances',
+  'tasks',
   'notes',
-  'code-library',
-  'code-vault',
-  'knowledge-hub',
-  'guided-checklists',
-  'error-decoder',
-  'permission-advisor',
-  'known-issues',
+  'snippets',
+  'vault',
+  'knowledge',
+  'checklists',
+  'errors',
+  'permissions',
 ];
 
 export const SHORTCUTS = [
@@ -22,7 +22,7 @@ export const SHORTCUTS = [
 ] as const;
 
 export function useKeyboardShortcuts() {
-  const { setActiveModule } = useAppStore();
+  const openWindow = useWindowStore(s => s.openWindow);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -38,18 +38,18 @@ export function useKeyboardShortcuts() {
         e.preventDefault();
         const idx = parseInt(e.key) - 1;
         if (idx < MODULE_ORDER.length) {
-          setActiveModule(MODULE_ORDER[idx]);
+          openWindow(MODULE_ORDER[idx]);
         }
       }
 
       // Ctrl+, — open settings
       if ((e.ctrlKey || e.metaKey) && e.key === ',') {
         e.preventDefault();
-        setActiveModule('settings');
+        openWindow('settings');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setActiveModule]);
+  }, [openWindow]);
 }
