@@ -233,13 +233,14 @@ const TaskTracker = () => {
         isOpen={isNewTaskModalOpen}
         onClose={() => setIsNewTaskModalOpen(false)}
         title="CREATE NEW TASK"
+        accent="copper"
       >
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Task Title</label>
             <input
               autoFocus
-              className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+              className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none transition-colors"
               placeholder="e.g. Debug SSO integration"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
@@ -247,11 +248,11 @@ const TaskTracker = () => {
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Platform</label>
               <input
-                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none transition-colors"
                 placeholder="e.g. Fusion, OIC, Web"
                 value={newTaskPlatform}
                 onChange={(e) => setNewTaskPlatform(e.target.value)}
@@ -261,7 +262,7 @@ const TaskTracker = () => {
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Priority</label>
               <select
-                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none transition-colors"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as any)}
               >
@@ -279,7 +280,7 @@ const TaskTracker = () => {
                 <Server size={11} /> Link to Instance (optional)
               </label>
               <select
-                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none transition-colors"
+                className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none transition-colors"
                 value={newTaskInstanceId}
                 onChange={e => setNewTaskInstanceId(e.target.value)}
               >

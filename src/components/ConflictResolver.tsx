@@ -34,7 +34,7 @@ const ConflictResolver: React.FC<ConflictResolverProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Resolve Sync Conflict">
+    <Modal isOpen={isOpen} onClose={onClose} title="Resolve Sync Conflict" accent="copper">
       <div className="space-y-6 max-w-4xl">
         <div className="p-4 bg-accent-red/10 border border-accent-red/20 rounded-xl flex items-center gap-4">
           <AlertTriangle className="text-accent-red" size={24} />
@@ -46,7 +46,7 @@ const ConflictResolver: React.FC<ConflictResolverProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 h-[400px]">
+        <div className="grid grid-cols-1 @sm:grid-cols-2 gap-6 h-[500px] @sm:h-[400px]">
           {/* Local Version */}
           <div className="flex flex-col border border-border rounded-xl overflow-hidden bg-background-primary">
             <div className="p-3 border-b border-border bg-background-secondary flex items-center justify-between">
@@ -64,7 +64,7 @@ const ConflictResolver: React.FC<ConflictResolverProps> = ({
             </div>
             <button 
               onClick={() => onResolve('LOCAL')}
-              className="m-3 btn-primary !bg-accent-green py-2 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+              className="m-3 btn-primary !bg-accent-green hover:!bg-accent-green/85 py-2 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={14} /> Keep My Changes
             </button>
@@ -74,7 +74,7 @@ const ConflictResolver: React.FC<ConflictResolverProps> = ({
           <div className="flex flex-col border border-border rounded-xl overflow-hidden bg-background-primary">
             <div className="p-3 border-b border-border bg-background-secondary flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Cloud size={14} className="text-[#a855f7]" />
+                <Cloud size={14} className="text-accent-violet" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Shared Cloud Version</span>
               </div>
             </div>
@@ -87,7 +87,7 @@ const ConflictResolver: React.FC<ConflictResolverProps> = ({
             </div>
             <button 
               onClick={() => onResolve('CLOUD')}
-              className="m-3 btn-primary !bg-[#a855f7] py-2 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+              className="m-3 btn-primary !bg-accent-violet hover:!bg-accent-violet/85 py-2 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
             >
               <ArrowLeftRight size={14} /> Overwrite with Cloud
             </button>

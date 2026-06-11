@@ -164,7 +164,7 @@ CRITICAL RULESET:
           {/* Query Bar */}
           <div className="space-y-2">
             <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Describe the action or requirement</label>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col @sm:flex-row gap-4">
                <div className="flex-1 flex items-center gap-3 bg-background-primary border border-border/50 rounded-2xl px-5 py-2 group focus-within:border-accent-blue/40 transition-all">
                   <span className="text-accent-blue opacity-50"><Search size={20} /></span>
                   <input 
@@ -240,7 +240,7 @@ CRITICAL RULESET:
       </div>
 
       {/* Shared History Prompt */}
-      <div className="mt-12 p-6 bg-background-tertiary border border-border rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 group">
+      <div className="mt-12 p-6 bg-background-tertiary border border-border rounded-2xl flex flex-col @sm:flex-row items-center justify-between gap-4 group">
          <div className="flex items-center gap-4">
             <History className="text-text-muted" size={24} />
             <div>

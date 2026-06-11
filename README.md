@@ -8,6 +8,7 @@ Kuro is a high-performance productivity hub designed for enterprise architects a
 - **Security & RBAC Mapping**: Specialized logic for Oracle JOB/DUTY roles and Salesforce Permission Sets with direct Security Console references.
 - **Local-First Architecture**: High-speed local SQLite database with optional cloud synchronization (Supabase).
 - **Glassmorphism UI**: High-fidelity, modern interface with interactive markdown rendering and actionable code blocks.
+- **Responsive Layouts**: Full support for container-based fluid grids (`@sm`, `@md`, `@lg`) allowing smooth window drag-and-resize support within the Electron desktop environment.
 - **Enterprise Modules**:
   - **Error Decoder**: Real-time diagnostic engine for complex platform logs.
   - **Permission Advisor**: Security mapping with official documentation verification.

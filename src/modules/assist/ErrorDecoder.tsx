@@ -184,7 +184,7 @@ CRITICAL RULESET:
 
       <div className="bg-background-secondary border border-border rounded-3xl p-8 shadow-2xl relative overflow-hidden">
         {/* Search Bar Container */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col @sm:flex-row gap-4">
           <div className="flex-1 flex items-center gap-3 bg-background-primary border border-border/50 rounded-2xl px-5 py-4 focus-within:border-accent-red/40 transition-all shadow-inner">
              <Search className="text-text-muted shrink-0" size={20} />
              <input 
@@ -258,7 +258,7 @@ CRITICAL RULESET:
                      <p className="text-sm leading-relaxed text-text-primary/90">{result.explanation}</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 @sm:grid-cols-2 gap-6">
                      <div className="p-6 bg-accent-red/5 border border-accent-red/10 rounded-2xl">
                         <h3 className="text-[10px] font-black text-accent-red uppercase tracking-[0.2em] mb-3">Root Cause</h3>
                         <p className="text-xs font-medium leading-relaxed">{result.root_cause}</p>
@@ -296,7 +296,7 @@ CRITICAL RULESET:
       </div>
 
       {/* Footer Info */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-40 grayscale group hover:grayscale-0 transition-all">
+      <div className="mt-12 grid grid-cols-1 @sm:grid-cols-3 gap-6 opacity-40 grayscale group hover:grayscale-0 transition-all">
          <div className="flex flex-col items-center gap-2 text-center">
             <Database size={24} />
             <p className="text-[8px] font-black uppercase tracking-[0.2em]">Shared Workspace DB</p>

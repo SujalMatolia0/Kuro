@@ -140,8 +140,8 @@ CRITICAL RULESET:
       </div>
 
       {/* Filters & Search */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
-         <div className="sm:col-span-2 flex items-center gap-3 bg-background-secondary border border-border rounded-xl px-4 py-3 group focus-within:border-accent-blue/40 transition-all">
+      <div className="grid grid-cols-1 @sm:grid-cols-4 gap-4 mb-8">
+         <div className="@sm:col-span-2 flex items-center gap-3 bg-background-secondary border border-border rounded-xl px-4 py-3 group focus-within:border-accent-blue/40 transition-all">
             <Search className="text-text-muted" size={18} />
             <input 
               className="bg-transparent border-none text-sm w-full focus:outline-none placeholder:text-text-muted/40"
@@ -167,7 +167,7 @@ CRITICAL RULESET:
       </div>
 
       {/* Issues Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-6">
          {filteredIssues.length === 0 ? (
            <div className="col-span-full">
              <EmptyState 
@@ -217,10 +217,11 @@ CRITICAL RULESET:
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         title={editingIssue ? "EDIT ISSUE REPORT" : "REPORT KNOWN ISSUE"}
+        accent="copper"
       >
         <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2 scrollbar-thin">
-           <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1 col-span-2 sm:col-span-1">
+           <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
+              <div className="space-y-1 col-span-2 @sm:col-span-1">
                  <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Issue Title</label>
                  <input 
                    className="w-full bg-background-primary border border-border rounded-xl p-3 text-sm focus:border-accent-blue focus:outline-none"
@@ -229,7 +230,7 @@ CRITICAL RULESET:
                    onChange={e => setTitle(e.target.value)}
                  />
               </div>
-              <div className="space-y-1 col-span-2 sm:col-span-1">
+              <div className="space-y-1 col-span-2 @sm:col-span-1">
                  <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Platform</label>
                  <select 
                    className="w-full bg-background-primary border border-border rounded-xl p-3 text-sm focus:border-accent-blue focus:outline-none"

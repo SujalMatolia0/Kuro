@@ -16,7 +16,7 @@ const SHELL_COLORS: Record<string, string> = {
   bash:        'text-accent-green  border-accent-green/30  bg-accent-green/10',
   powershell:  'text-accent-blue   border-accent-blue/30   bg-accent-blue/10',
   cmd:         'text-accent-amber  border-accent-amber/30  bg-accent-amber/10',
-  sql:         'text-[#a855f7]     border-[#a855f7]/30     bg-[#a855f7]/10',
+  sql:         'text-accent-violet border-accent-violet/30 bg-accent-violet/10',
   other:       'text-text-muted    border-border            bg-background-tertiary',
 };
 
@@ -386,15 +386,15 @@ const Checklists = () => {
           <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2 scrollbar-thin">
 
             {/* Title + Platform */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Runbook Title</label>
-                <input className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none"
+                <input className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none"
                   placeholder="e.g. Weekly Production Deployment" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Platform</label>
-                <input className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-blue focus:outline-none"
+                <input className="w-full bg-background-primary border border-border rounded-standard p-3 text-sm focus:border-accent-green focus:outline-none"
                   placeholder="e.g. HCM, OIC, GitHub" value={newPlatform} onChange={e => setNewPlatform(e.target.value)} />
               </div>
             </div>
@@ -402,11 +402,11 @@ const Checklists = () => {
             {/* Modal tab switcher */}
             <div className="flex gap-1 border-b border-border pb-2">
               <button onClick={() => setModalTab('steps')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-black uppercase tracking-widest transition-all ${modalTab === 'steps' ? 'bg-accent-blue/10 text-accent-blue' : 'text-text-muted hover:text-text-primary'}`}>
+                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-black uppercase tracking-widest transition-all ${modalTab === 'steps' ? 'bg-accent-green/10 text-accent-green' : 'text-text-muted hover:text-text-primary'}`}>
                 <CheckSquare size={13} /> Steps ({newSteps.length})
               </button>
               <button onClick={() => setModalTab('commands')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-black uppercase tracking-widest transition-all ${modalTab === 'commands' ? 'bg-accent-amber/10 text-accent-amber' : 'text-text-muted hover:text-text-primary'}`}>
+                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-black uppercase tracking-widest transition-all ${modalTab === 'commands' ? 'bg-accent-green/10 text-accent-green' : 'text-text-muted hover:text-text-primary'}`}>
                 <Terminal size={13} /> Commands ({newCommands.length})
               </button>
             </div>
@@ -424,7 +424,7 @@ const Checklists = () => {
                     <button onClick={() => removeStepRow(idx)} className="p-2 text-text-muted hover:text-accent-red"><Trash2 size={14} /></button>
                   </div>
                 ))}
-                <button onClick={addStepRow} className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-border rounded-standard text-xs text-text-muted hover:text-white hover:border-accent-blue transition-all">
+                <button onClick={addStepRow} className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-border rounded-standard text-xs text-text-muted hover:text-white hover:border-accent-green transition-all">
                   <Plus size={14} /> Add Step
                 </button>
               </div>
@@ -443,7 +443,7 @@ const Checklists = () => {
                     <div className="flex items-center gap-2">
                       {/* Shell type */}
                       <select
-                        className="bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs font-black focus:outline-none focus:border-accent-amber shrink-0"
+                        className="bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs font-black focus:outline-none focus:border-accent-green shrink-0"
                         value={cmd.shell || 'bash'}
                         onChange={e => updateCmd(idx, 'shell', e.target.value)}
                       >
@@ -454,23 +454,23 @@ const Checklists = () => {
                         <option value="other">other</option>
                       </select>
                       {/* Label */}
-                      <input className="flex-1 bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs focus:border-accent-amber focus:outline-none"
+                      <input className="flex-1 bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs focus:border-accent-green focus:outline-none"
                         placeholder="Label (e.g. Push to GitHub)" value={cmd.label} onChange={e => updateCmd(idx, 'label', e.target.value)} />
                       <button onClick={() => removeCmdRow(idx)} className="p-1.5 text-text-muted hover:text-accent-red shrink-0"><Trash2 size={13} /></button>
                     </div>
                     {/* Command */}
                     <textarea
-                      className="w-full bg-[#0d1117] border border-border rounded px-3 py-2 text-xs font-mono text-accent-green focus:border-accent-amber focus:outline-none scrollbar-thin h-16 resize-none"
+                      className="w-full bg-[#0d1117] border border-border rounded px-3 py-2 text-xs font-mono text-accent-green focus:border-accent-green focus:outline-none scrollbar-thin h-16 resize-none"
                       placeholder="git push origin main"
                       value={cmd.command}
                       onChange={e => updateCmd(idx, 'command', e.target.value)}
                     />
                     {/* Optional description */}
-                    <input className="w-full bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs text-text-muted focus:border-accent-amber focus:outline-none"
+                    <input className="w-full bg-background-tertiary border border-border rounded px-2 py-1.5 text-xs text-text-muted focus:border-accent-green focus:outline-none"
                       placeholder="Optional description..." value={cmd.description || ''} onChange={e => updateCmd(idx, 'description', e.target.value)} />
                   </div>
                 ))}
-                <button onClick={addCmdRow} className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-border rounded-standard text-xs text-text-muted hover:text-accent-amber hover:border-accent-amber transition-all">
+                <button onClick={addCmdRow} className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-border rounded-standard text-xs text-text-muted hover:text-accent-green hover:border-accent-green transition-all">
                   <Plus size={14} /> Add Command
                 </button>
               </div>
@@ -479,7 +479,7 @@ const Checklists = () => {
             <button
               onClick={handleSaveTemplate}
               disabled={!newTitle || newSteps.some(s => !s.text.trim())}
-              className="w-full btn-primary !bg-accent-blue py-3 flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+              className="w-full btn-primary py-3 flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
             >
               <Save size={16} />
               <span className="font-black text-xs uppercase tracking-widest">{editMode ? 'UPDATE TEMPLATE' : 'PUBLISH RUNBOOK'}</span>

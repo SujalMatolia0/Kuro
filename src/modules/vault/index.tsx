@@ -181,9 +181,9 @@ const CodeVault = () => {
     <div className="h-[calc(100vh-40px)] flex flex-col animate-in fade-in zoom-in-95 duration-500 pb-4 gap-6">
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <Archive className="text-[#a855f7]" size={32} />
+          <Archive className="text-accent-green" size={32} />
           <div>
-            <h1 className="text-2xl font-black tracking-tighter text-[#a855f7] uppercase">Code & File Vault</h1>
+            <h1 className="text-2xl font-black tracking-tighter text-accent-green uppercase">Code & File Vault</h1>
             <p className="text-xs text-text-muted">Cloud synced heavy-duty asset storage.</p>
           </div>
         </div>
@@ -199,7 +199,7 @@ const CodeVault = () => {
           </div>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="btn-primary !bg-[#a855f7] py-2 px-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+            className="btn-secondary py-2 px-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
           >
             <UploadCloud size={16} />
             <span>Upload Asset</span>
@@ -208,7 +208,7 @@ const CodeVault = () => {
       </div>
 
       {!viewFileId ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto scrollbar-thin pr-2">
+        <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4 gap-4 overflow-y-auto scrollbar-thin pr-2">
            {isLoading ? (
              <div className="col-span-full py-12 flex flex-col items-center justify-center text-text-muted opacity-50 animate-pulse">
                <Archive size={48} className="mb-4" />
@@ -228,11 +228,11 @@ const CodeVault = () => {
                <div 
                  key={file.id}
                  onClick={() => handleViewFile(file.id!)}
-                 className="card flex flex-col gap-4 cursor-pointer hover:border-[#a855f7] hover:shadow-[0_0_15px_rgba(168,85,247,0.1)] group"
+                 className="card flex flex-col gap-4 cursor-pointer hover:border-accent-green hover:shadow-[0_0_15px_rgba(74,124,111,0.15)] group"
                >
                  <div className="flex items-start justify-between">
                    <div className="flex items-center gap-3">
-                     <div className="p-2 bg-background-tertiary rounded-lg text-[#a855f7]">
+                     <div className="p-2 bg-background-tertiary rounded-lg text-accent-green">
                        {file.filetype.includes('json') ? <Code size={20} /> : <FileText size={20} />}
                      </div>
                      <div>
@@ -246,7 +246,7 @@ const CodeVault = () => {
                        ) : (
                          <button 
                            onClick={(e) => handlePushSync(e, file.id!)}
-                           className="p-1.5 bg-[#a855f7]/10 text-[#a855f7] rounded-lg hover:bg-[#a855f7]/20 transition-colors"
+                           className="p-1.5 bg-accent-green/10 text-accent-green rounded-lg hover:bg-accent-green/20 transition-colors"
                            title="Push to Cloud"
                          >
                            <CloudUpload size={14} />
@@ -267,11 +267,11 @@ const CodeVault = () => {
                  
                  <div className="flex items-center justify-between border-t border-border pt-4 mt-auto">
                    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold">
-                     <span className="text-[#a855f7]">{file.platform}</span>
+                     <span className="text-accent-green">{file.platform}</span>
                      <span className="text-text-muted">•</span>
                      <span className="text-text-muted">{file.version_note}</span>
                    </div>
-                   <ChevronRight size={14} className="text-[#a855f7] group-hover:translate-x-1 transition-transform" />
+                   <ChevronRight size={14} className="text-accent-green group-hover:translate-x-1 transition-transform" />
                  </div>
                </div>
              ))
@@ -291,7 +291,7 @@ const CodeVault = () => {
                <div>
                  <h2 className="text-lg font-bold flex items-center gap-2">
                    {files.find(f => f.id === viewFileId)?.name}
-                   <span className="text-[10px] px-2 py-0.5 rounded border border-border text-[#a855f7] uppercase tracking-widest">
+                   <span className="text-[10px] px-2 py-0.5 rounded border border-border text-accent-green uppercase tracking-widest">
                      {files.find(f => f.id === viewFileId)?.version_note}
                    </span>
                  </h2>
@@ -300,7 +300,7 @@ const CodeVault = () => {
             <button 
               onClick={(e) => handleDownload(e, files.find(f => f.id === viewFileId)!)}
               disabled={isLoadingFile}
-              className="flex items-center gap-2 btn-primary !bg-[#a855f7] py-1.5 px-4 disabled:opacity-50"
+              className="flex items-center gap-2 btn-secondary py-1.5 px-4 disabled:opacity-50"
             >
               <Download size={14} />
               <span className="text-xs">Download Raw</span>
@@ -312,7 +312,7 @@ const CodeVault = () => {
               'Accessing cloud storage...'
             ) : files.find(f => f.id === viewFileId)?.storage_path ? (
               <>
-                <FileCode size={48} className="text-[#a855f7] opacity-40" />
+                <FileCode size={48} className="text-accent-green opacity-40" />
                 <div className="space-y-2">
                   <p className="font-bold text-text-primary tracking-tight">Binary File Bundle</p>
                   <p className="text-xs text-text-muted max-w-xs mx-auto">This file is stored as a compressed asset in Supabase. Download to view or use.</p>
@@ -332,7 +332,7 @@ const CodeVault = () => {
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Filename (with extension)</label>
               <input 
-                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-[#a855f7] focus:outline-none"
+                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
                 placeholder="e.g. ERP_Integration_Map.xml"
                 value={newName}
                 onChange={e => {
@@ -343,11 +343,11 @@ const CodeVault = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
                <div className="space-y-1">
                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Platform</label>
                 <input 
-                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-[#a855f7] focus:outline-none"
+                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
                   placeholder="e.g. OIC, Fusion"
                   value={newPlatform}
                   onChange={e => setNewPlatform(e.target.value)}
@@ -356,7 +356,7 @@ const CodeVault = () => {
                <div className="space-y-1">
                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Version</label>
                 <input 
-                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-[#a855f7] focus:outline-none"
+                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
                   placeholder="v1.0.0"
                   value={newVersion}
                   onChange={e => setNewVersion(e.target.value)}
@@ -368,7 +368,7 @@ const CodeVault = () => {
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Select File (Auto-Zip enabled)</label>
               <div 
                 className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer ${
-                  selectedFile ? 'border-accent-green bg-accent-green/5' : 'border-border hover:border-[#a855f7]'
+                  selectedFile ? 'border-accent-green bg-accent-green/5' : 'border-border hover:border-accent-green'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -413,7 +413,7 @@ const CodeVault = () => {
             <button 
               onClick={handleUpload}
               disabled={!newName || !selectedFile || isUploading}
-              className="w-full btn-primary !bg-[#a855f7] py-3 mt-4 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full btn-secondary py-3 mt-4 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isUploading ? (
                 <>

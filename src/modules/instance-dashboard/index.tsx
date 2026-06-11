@@ -83,7 +83,7 @@ const InstanceDashboard = () => {
                 <div className="w-1 h-4 bg-accent-blue rounded-full" />
                 <h2 className="text-xs font-bold text-text-muted tracking-widest uppercase">Project Environments</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 gap-6">
                 {projectInstances.map(instance => (
                   <InstanceCard key={instance.id} instance={instance} onUpdate={loadInstances} refreshKey={refreshKey} />
                 ))}
@@ -97,7 +97,7 @@ const InstanceDashboard = () => {
                 <div className="w-1 h-4 bg-accent-amber rounded-full" />
                 <h2 className="text-xs font-bold text-text-muted tracking-widest uppercase">Demo & Sandbox</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 gap-6">
                 {demoInstances.map(instance => (
                   <InstanceCard key={instance.id} instance={instance} onUpdate={loadInstances} refreshKey={refreshKey} />
                 ))}

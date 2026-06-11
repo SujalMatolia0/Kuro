@@ -1,0 +1,45 @@
+:root {
+  /* Backgrounds */
+  --bg0: #0C0B09;     /* void — desktop canvas */
+  --bg1: #1A1713;     /* surface — taskbar, window titlebars */
+  --bg2: #221F1A;     /* elevated — window bodies */
+  --bg3: #2C2820;     /* hover / active fills */
+
+  /* Accents */
+  --copper:  #B5651D;  /* primary — Fusion/Instance modules */
+  --copper2: #C8882A;  /* warning states */
+  --jade:    #4A7C6F;  /* secondary — Knowledge/Vault modules */
+  --jade2:   #5A9A8A;  /* success / online */
+  --red:     #7A3020;  /* error / critical / blocked */
+
+  /* Button surfaces — brighter than accent so text stays legible */
+  --copper-btn:       #D4782A;  /* copper button bg  — contrast 4.7:1 vs --btn-text */
+  --copper-btn-hover: #E8903A;  /* copper hover      — contrast 5.9:1 vs --btn-text */
+  --jade-btn:         #3D8A7A;  /* jade button bg    — contrast 4.8:1 vs --btn-text */
+  --jade-btn-hover:   #4DA896;  /* jade hover        — contrast 6.1:1 vs --btn-text */
+  --red-btn:          #B03A28;  /* red/danger btn bg — contrast 4.5:1 vs --btn-text */
+  --red-btn-hover:    #C94432;  /* red hover                                         */
+  --btn-text:         #F5EFE4;  /* on-button text — warm white, high contrast */
+
+  /* Text */
+  --t1: #D4C9B8;  /* primary — warm parchment */
+  --t2: #8C8070;  /* secondary */
+  --t3: #5A5248;  /* muted / labels */
+
+  /* Borders */
+  --b1: rgba(180,150,100,0.10);
+  --b2: rgba(180,150,100,0.18);
+  --b3: rgba(180,150,100,0.30);
+
+  /* Window accent colors by module group */
+  --accent-infrastructure: var(--copper);
+  --accent-knowledge:      var(--jade);
+  --accent-security:       #7B61FF;  /* violet — Error Decoder, Permission Advisor */
+  --accent-system:         var(--t3);
+
+  /* Spacing */
+  --taskbar-height: 44px;
+  --taskbar-bottom: 12px;
+  --window-radius:  11px;
+  --pill-radius:    22px;
+}

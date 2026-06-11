@@ -27,9 +27,7 @@ interface AppState {
   setActiveWorkspace: (workspace: Workspace | null) => void;
   setWorkspaces: (workspaces: Workspace[]) => void;
 
-  // Nav
-  activeModule: string;
-  setActiveModule: (module: string) => void;
+  // Nav — removed: activeModule was unused in OS shell (windows managed by windowStore)
 
   // Settings
   settings: {
@@ -41,6 +39,7 @@ interface AppState {
     openaiKey?: string;
     anthropicKey?: string;
     groqKey?: string;
+    useCanvasLayout?: boolean;
   };
   profile: {
     name: string;
@@ -63,9 +62,6 @@ export const useAppStore = create<AppState>()(
       workspaces: [],
       setActiveWorkspace: (workspace) => set({ activeWorkspace: workspace }),
       setWorkspaces: (workspaces) => set({ workspaces }),
-
-      activeModule: 'instance-dashboard',
-      setActiveModule: (activeModule) => set({ activeModule }),
 
       settings: {
         preferredBrowser: 'Default System Browser',
@@ -92,8 +88,10 @@ export const useAppStore = create<AppState>()(
         profile: state.profile,
         activeWorkspace: state.activeWorkspace,
         workspaces: state.workspaces,
-        activeModule: state.activeModule
       }),
     }
   )
 );
+
+export { useWindowStore } from './windowStore';
+export type { KuroWindowState, ModuleId, WindowAccentGroup } from './windowStore';

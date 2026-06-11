@@ -3,18 +3,33 @@ import Modal from './Modal';
 import { useAppStore } from '../store';
 import { Lock, Unlock } from 'lucide-react';
 
+import { sfx } from '../lib/sfx';
+
 interface PinModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   mode: 'setup' | 'verify';
+  accent?: 'copper' | 'jade' | 'violet';
 }
 
-const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode }) => {
+const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode, accent = 'copper' }) => {
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [error, setError] = useState('');
   const { settings, updateSettings, setUnlocked } = useAppStore();
+
+  const focusBorder = accent === 'copper' 
+    ? 'focus:border-accent-blue' 
+    : accent === 'violet' 
+      ? 'focus:border-accent-violet' 
+      : 'focus:border-accent-green';
+  
+  const textAccent = accent === 'copper' 
+    ? 'text-accent-blue' 
+    : accent === 'violet' 
+      ? 'text-accent-violet' 
+      : 'text-accent-green';
 
   const hashPin = async (input: string) => {
     const msgBuffer = new TextEncoder().encode(input);
@@ -28,15 +43,18 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode })
     
     if (mode === 'setup') {
       if (pin.length < 4) {
+        sfx.play('alert');
         setError('PIN must be at least 4 digits');
         return;
       }
       if (pin !== confirmPin) {
+        sfx.play('alert');
         setError('PINs do not match');
         return;
       }
       updateSettings({ pinHash: hashedInput }); 
       setUnlocked(true);
+      sfx.play('startup');
       onSuccess();
     } else {
       // Logic: Compare hash. Support plain-text fallback once for migration.
@@ -46,8 +64,10 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode })
         if (pin === settings.pinHash && hashedInput !== settings.pinHash) {
           updateSettings({ pinHash: hashedInput });
         }
+        sfx.play('startup');
         onSuccess();
       } else {
+        sfx.play('alert');
         setError('Incorrect PIN');
       }
     }
@@ -57,10 +77,11 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode })
     <Modal 
       isOpen={isOpen} 
       onClose={onClose} 
-      title={mode === 'setup' ? 'SET SECURITY PIN' : 'UNLOCK VAULT'}
+      title={mode === 'setup' ? 'SET SECURITY PIN' : (accent === 'copper' ? 'UNLOCK CREDENTIALS' : 'UNLOCK VAULT')}
+      accent={accent}
     >
       <div className="space-y-6 flex flex-col items-center">
-        <div className="w-16 h-16 rounded-full bg-background-tertiary flex items-center justify-center text-accent-green mb-2">
+        <div className={`w-16 h-16 rounded-full bg-background-tertiary flex items-center justify-center mb-2 ${textAccent}`}>
           {mode === 'setup' ? <Lock size={32} /> : <Unlock size={32} />}
         </div>
         
@@ -73,7 +94,7 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode })
               type="password"
               autoFocus
               maxLength={6}
-              className="w-full bg-background-primary border border-border rounded-standard p-4 text-center text-2xl tracking-[1em] focus:border-accent-green focus:outline-none transition-colors"
+              className={`w-full bg-background-primary border border-border rounded-standard p-4 text-center text-2xl tracking-[1em] focus:outline-none transition-colors ${focusBorder}`}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
             />
@@ -85,7 +106,7 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, mode })
               <input 
                 type="password"
                 maxLength={6}
-                className="w-full bg-background-primary border border-border rounded-standard p-4 text-center text-2xl tracking-[1em] focus:border-accent-green focus:outline-none transition-colors"
+                className={`w-full bg-background-primary border border-border rounded-standard p-4 text-center text-2xl tracking-[1em] focus:outline-none transition-colors ${focusBorder}`}
                 value={confirmPin}
                 onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
               />

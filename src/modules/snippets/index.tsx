@@ -14,9 +14,9 @@ import EmptyState from '../../components/EmptyState';
 
 type CodeType = 'snippet' | 'component';
 
-const CodeLibrary = () => {
+const CodeLibrary = ({ defaultType = 'snippet' }: { defaultType?: CodeType }) => {
   const { profile, activeWorkspace } = useAppStore();
-  const [activeType, setActiveType] = useState<CodeType>('snippet');
+  const [activeType, setActiveType] = useState<CodeType>(defaultType);
   const [items, setItems] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -142,7 +142,7 @@ const CodeLibrary = () => {
       <div className="w-full sm:w-1/3 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {activeType === 'snippet' ? <Terminal className="text-accent-blue" size={24} /> : <Layers className="text-purple-400" size={24} />}
+            {activeType === 'snippet' ? <Terminal className="text-accent-blue" size={24} /> : <Layers className="text-accent-green" size={24} />}
             <h1 className="text-2xl font-black tracking-tighter uppercase whitespace-nowrap">
               {activeType === 'snippet' ? 'Snippets' : 'Components'}
             </h1>
@@ -150,7 +150,7 @@ const CodeLibrary = () => {
           <button 
             onClick={() => setIsModalOpen(true)}
             className={`p-2 bg-background-tertiary border border-border rounded-standard transition-colors ${
-              activeType === 'snippet' ? 'text-accent-blue' : 'text-purple-400'
+              activeType === 'snippet' ? 'text-accent-blue' : 'text-accent-green'
             } hover:text-white`}
           >
             <Plus size={18} />
@@ -170,7 +170,7 @@ const CodeLibrary = () => {
           <button 
             onClick={() => setActiveType('component')}
             className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-standard text-[10px] font-black tracking-widest transition-all ${
-              activeType === 'component' ? 'bg-background-tertiary text-purple-400 shadow-lg border border-border' : 'text-text-muted hover:text-white'
+              activeType === 'component' ? 'bg-background-tertiary text-accent-green shadow-lg border border-border' : 'text-text-muted hover:text-white'
             }`}
           >
             <Layers size={12} /> COMPONENTS
@@ -204,7 +204,7 @@ const CodeLibrary = () => {
                 onClick={() => setActiveId(item.id!)}
                 className={`w-full text-left p-3 rounded-card transition-all border ${
                   activeId === item.id 
-                    ? `bg-background-tertiary border-${activeType === 'snippet' ? 'accent-blue' : 'purple-400'}` 
+                    ? `bg-background-tertiary border-${activeType === 'snippet' ? 'accent-blue' : 'accent-green'}` 
                     : 'bg-background-secondary/50 border-border hover:border-text-muted'
                 }`}
               >
@@ -217,7 +217,7 @@ const CodeLibrary = () => {
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] uppercase font-bold tracking-widest ${activeType === 'snippet' ? 'text-accent-blue' : 'text-purple-400'}`}>
+                  <span className={`text-[10px] uppercase font-bold tracking-widest ${activeType === 'snippet' ? 'text-accent-blue' : 'text-accent-green'}`}>
                     {item.language}
                   </span>
                   <span className="text-[10px] text-text-muted uppercase tracking-widest truncate max-w-20">
@@ -236,7 +236,7 @@ const CodeLibrary = () => {
           <>
             <div className="p-5 border-b border-border flex items-center justify-between bg-background-tertiary">
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl bg-background-primary border border-border ${activeType === 'snippet' ? 'text-accent-blue' : 'text-purple-400'}`}>
+                <div className={`p-3 rounded-xl bg-background-primary border border-border ${activeType === 'snippet' ? 'text-accent-blue' : 'text-accent-green'}`}>
                    {activeType === 'snippet' ? <Terminal size={24} /> : <Layout size={24} />}
                 </div>
                 <div>
@@ -316,7 +316,7 @@ const CodeLibrary = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
                <div className="space-y-1">
                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Language</label>
                 <select 
@@ -369,7 +369,7 @@ const CodeLibrary = () => {
             <button 
               onClick={handleCreate}
               disabled={!newTitle || !newCode}
-              className={`w-full btn-primary py-3 mt-4 disabled:opacity-50 !bg-${activeType === 'snippet' ? 'accent-blue' : 'purple-500'}`}
+              className={`w-full py-3 mt-4 disabled:opacity-50 ${activeType === 'snippet' ? 'btn-primary' : 'btn-secondary'}`}
             >
               SAVE LOCALLY
             </button>

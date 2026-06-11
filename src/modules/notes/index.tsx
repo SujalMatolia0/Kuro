@@ -73,7 +73,11 @@ const QuickNotes = () => {
   const toggleGroup = (group: string) => {
     setCollapsedGroups(prev => {
       const next = new Set(prev);
-      next.has(group) ? next.delete(group) : next.add(group);
+      if (next.has(group)) {
+        next.delete(group);
+      } else {
+        next.add(group);
+      }
       return next;
     });
   };
@@ -197,7 +201,7 @@ const QuickNotes = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={14} />
           <input
             placeholder="Search notes..."
-            className="w-full bg-background-primary border border-border rounded-standard py-2 pl-9 pr-4 text-xs focus:border-accent-green focus:outline-none transition-all"
+            className="w-full bg-background-primary border border-border rounded-standard py-2 pl-9 pr-4 text-xs focus:border-accent-blue focus:outline-none transition-all"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -348,7 +352,7 @@ const QuickNotes = () => {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-standard text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${
                   selectedNote.is_synced
                     ? 'bg-accent-green/10 text-accent-green cursor-default'
-                    : 'bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-lg shadow-purple-500/20'
+                    : 'btn-primary !py-1.5 !px-3 !text-[10px]'
                 }`}
               >
                 {isSyncing ? <RotateCw size={12} className="animate-spin" />

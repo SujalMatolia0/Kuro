@@ -1,65 +1,108 @@
 import { useState, useEffect, useRef } from 'react';
+import { create } from 'zustand';
 import { Command } from 'cmdk';
 import { useAppStore } from '../store';
+import { useWindowStore } from '../store/windowStore';
+import type { ModuleId } from '../store/windowStore';
 import { 
   Server, Kanban, Book, Archive, Code, FileText, Shield, 
   AlertCircle, CheckSquare, Bug, Settings, History, Search,
-  ArrowRight, Command as CommandIcon, FileSearch, Hash, StickyNote
+  ArrowRight, Command as CommandIcon, FileSearch, Hash, StickyNote,
+  Cpu, Users, Map, Puzzle, Terminal
 } from 'lucide-react';
 import { noteQueries } from '../db/queries';
 import { cloudSnippetQueries, cloudKnowledgeQueries } from '../db/cloudQueries';
 import Fuse from 'fuse.js';
 
-const modules = [
-  { id: 'instance-dashboard', label: 'Instance Dashboard', icon: Server, group: 'Productivity', keywords: 'instances servers projects' },
-  { id: 'task-tracker', label: 'Task Tracker', icon: Kanban, group: 'Productivity', keywords: 'tasks kanban board todo' },
-  { id: 'notes', label: 'Quick Notes', icon: FileText, group: 'Development', keywords: 'notes scratch pad' },
-  { id: 'code-library', label: 'Code Library', icon: Code, group: 'Development', keywords: 'snippets components code' },
-  { id: 'code-vault', label: 'File Vault', icon: Archive, group: 'Development', keywords: 'vault files upload storage' },
-  { id: 'audit-trail', label: 'Audit Trail', icon: History, group: 'Development', keywords: 'audit logs history' },
-  { id: 'knowledge-hub', label: 'Knowledge Hub', icon: Book, group: 'Intelligence', keywords: 'knowledge articles glossary api guides' },
-  { id: 'guided-checklists', label: 'Guided Checklists', icon: CheckSquare, group: 'Assist', keywords: 'checklists runbooks' },
-  { id: 'permission-advisor', label: 'Permission Advisor', icon: Shield, group: 'Assist', keywords: 'permissions roles access advisor' },
-  { id: 'error-decoder', label: 'Error Decoder', icon: AlertCircle, group: 'Assist', keywords: 'errors decode logs debug' },
-  { id: 'known-issues', label: 'Known Issues', icon: Bug, group: 'Assist', keywords: 'bugs issues workarounds' },
-  { id: 'settings', label: 'Settings', icon: Settings, group: 'System', keywords: 'settings preferences api keys theme' },
+// ── Shared store so external components (e.g. DesktopContextMenu) can toggle ─
+interface CommandPaletteStore {
+  isOpen: boolean;
+  open:   () => void;
+  close:  () => void;
+  toggle: () => void;
+}
+
+export const useCommandPaletteStore = create<CommandPaletteStore>()((set) => ({
+  isOpen: false,
+  open:   () => set({ isOpen: true }),
+  close:  () => set({ isOpen: false }),
+  toggle: () => set(s => ({ isOpen: !s.isOpen })),
+}));
+
+// ── Module definitions with CORRECT windowStore ModuleId values ─────────────
+interface ModuleDef {
+  id: ModuleId;
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  group: string;
+  keywords: string;
+}
+
+const MODULES: ModuleDef[] = [
+  { id: 'instances',           label: 'Instance Dashboard',   icon: Server,       group: 'Workspace',    keywords: 'instances servers projects environments' },
+  { id: 'tasks',               label: 'Task Tracker',         icon: Kanban,       group: 'Workspace',    keywords: 'tasks kanban board todo' },
+  { id: 'notes',               label: 'Quick Notes',          icon: FileText,     group: 'Workspace',    keywords: 'notes scratch pad' },
+  { id: 'issues',              label: 'Known Issues',         icon: Bug,          group: 'Workspace',    keywords: 'bugs issues workarounds known' },
+  { id: 'role-command-center', label: 'Command Center',       icon: Cpu,          group: 'Workspace',    keywords: 'command center roles cpu' },
+  { id: 'knowledge',           label: 'Knowledge Base',       icon: Book,         group: 'Knowledge',    keywords: 'knowledge articles docs documentation' },
+  { id: 'glossary',            label: 'Terminology Glossary', icon: Hash,         group: 'Knowledge',    keywords: 'glossary terms definitions' },
+  { id: 'api-reference',       label: 'API Reference',        icon: Terminal,     group: 'Knowledge',    keywords: 'api reference endpoints specs' },
+  { id: 'onboarding',          label: 'Onboarding Guide',     icon: Map,          group: 'Knowledge',    keywords: 'onboarding guide setup steps' },
+  { id: 'checklists',          label: 'Guided Checklists',    icon: CheckSquare,  group: 'Knowledge',    keywords: 'checklists runbooks guides procedures' },
+  { id: 'vault',               label: 'File Vault',           icon: Archive,      group: 'Library',      keywords: 'vault files upload storage assets' },
+  { id: 'snippets',            label: 'Snippet Library',      icon: Code,         group: 'Library',      keywords: 'snippets components code templates' },
+  { id: 'components',          label: 'Component Registry',   icon: Puzzle,       group: 'Library',      keywords: 'components ui registry' },
+  { id: 'permissions',         label: 'Permission Advisor',   icon: Shield,       group: 'Security',     keywords: 'permissions roles access advisor' },
+  { id: 'errors',              label: 'Error Decoder',        icon: AlertCircle,  group: 'Security',     keywords: 'errors decode logs debug' },
+  { id: 'role-advisor',        label: 'Role Advisor',         icon: Users,        group: 'Security',     keywords: 'roles advisor access' },
+  { id: 'audit',               label: 'Audit Trail',          icon: History,      group: 'System',       keywords: 'audit logs history trail' },
+  { id: 'settings',            label: 'Settings',             icon: Settings,     group: 'System',       keywords: 'settings preferences api keys theme' },
 ];
+
+// Map old content-search module references to correct ModuleIds
+const CONTENT_MODULE_MAP: Record<string, ModuleId> = {
+  'notes':        'notes',
+  'code-library': 'snippets',
+  'knowledge-hub': 'knowledge',
+};
 
 interface ContentResult {
   id: string;
   title: string;
   subtitle: string;
-  module: string;
-  icon: any;
+  moduleId: ModuleId;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
 }
 
 const CommandPalette = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  // isOpen controlled via shared store so other components can trigger it
+  const { isOpen, close: closepalette, toggle } = useCommandPaletteStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [contentResults, setContentResults] = useState<ContentResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const { setActiveModule, workspaces, setActiveWorkspace, activeWorkspace, profile, updateSettings } = useAppStore();
+
+  const { workspaces, setActiveWorkspace, activeWorkspace, profile, updateSettings } = useAppStore();
+  const openWindow = useWindowStore(s => s.openWindow);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ── Keyboard shortcut: Ctrl/Cmd+K to toggle ───────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsOpen(prev => !prev);
-      }
-      if (e.key === 'Escape' && isOpen) setIsOpen(false);
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggle(); }
+      if (e.key === 'Escape' && isOpen) closepalette();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, toggle, closepalette]);
 
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 50);
     else { setSearchQuery(''); setContentResults([]); }
   }, [isOpen]);
 
-  // Global content search — debounced
+  // ── Global content search — debounced 300ms ───────────────────────────────
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (searchQuery.length < 2) { setContentResults([]); return; }
@@ -69,86 +112,126 @@ const CommandPalette = () => {
       const results: ContentResult[] = [];
 
       try {
-        // Search notes (local)
+        // Search notes (local SQLite)
         const notes = await noteQueries.getAll();
         const fuseNotes = new Fuse(notes, { keys: ['title', 'body'], threshold: 0.3 });
         fuseNotes.search(searchQuery).slice(0, 3).forEach(r => {
-          results.push({ id: r.item.id, title: r.item.title, subtitle: 'Note', module: 'notes', icon: StickyNote });
+          results.push({ id: r.item.id, title: r.item.title, subtitle: 'Note', moduleId: 'notes', icon: StickyNote });
         });
 
-        // Search snippets (cloud)
         if (profile.email) {
+          // Search snippets (cloud)
           const snippets = await cloudSnippetQueries.getAll(profile.email);
           const fuseSnippets = new Fuse(snippets, { keys: ['title', 'platform', 'tags'], threshold: 0.3 });
           fuseSnippets.search(searchQuery).slice(0, 3).forEach(r => {
-            results.push({ id: r.item.id!, title: r.item.title, subtitle: `Snippet · ${r.item.platform}`, module: 'code-library', icon: Code });
+            results.push({ id: r.item.id!, title: r.item.title, subtitle: `Snippet · ${r.item.platform}`, moduleId: 'snippets', icon: Code });
           });
 
-          // Search KB (cloud)
+          // Search Knowledge Base (cloud)
           const kb = await cloudKnowledgeQueries.getAll(profile.email);
           const fuseKb = new Fuse(kb, { keys: ['title', 'category', 'platform'], threshold: 0.3 });
           fuseKb.search(searchQuery).slice(0, 3).forEach(r => {
-            results.push({ id: r.item.id!, title: r.item.title, subtitle: `Knowledge · ${r.item.type}`, module: 'knowledge-hub', icon: r.item.type === 'term' ? Hash : Book });
+            results.push({ id: r.item.id!, title: r.item.title, subtitle: `Knowledge · ${r.item.type}`, moduleId: 'knowledge', icon: r.item.type === 'term' ? Hash : Book });
           });
         }
-      } catch (e) { /* silent */ }
+      } catch { /* silent — DB may not be available in dev mode */ }
 
       setContentResults(results);
       setIsSearching(false);
     }, 300);
-  }, [searchQuery]);
+  }, [searchQuery, profile.email]);
 
-  const navigateTo = (moduleId: string) => { setActiveModule(moduleId); setIsOpen(false); };
-  const switchWorkspace = (ws: any) => { setActiveWorkspace(ws); setIsOpen(false); };
+  // ── Actions ───────────────────────────────────────────────────────────────
+  const openModule = (moduleId: ModuleId) => {
+    openWindow(moduleId);
+    closepalette();
+  };
+
+  const switchWorkspace = (ws: typeof workspaces[0]) => {
+    setActiveWorkspace(ws);
+    closepalette();
+  };
 
   if (!isOpen) return null;
+
+  // Group modules for rendering
+  const grouped = MODULES.reduce((acc, mod) => {
+    if (!acc[mod.group]) acc[mod.group] = [];
+    acc[mod.group].push(mod);
+    return acc;
+  }, {} as Record<string, ModuleDef[]>);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
-        onClick={() => setIsOpen(false)}
+        onClick={closepalette}
       />
       
       {/* Palette */}
       <div className="relative w-full max-w-xl animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
         <Command 
-          className="bg-background-secondary border border-border rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
+          className="overflow-hidden rounded-2xl shadow-2xl shadow-black/60"
+          style={{
+            background: 'rgba(26, 23, 19, 0.97)',
+            border: '0.5px solid var(--b2)',
+            backdropFilter: 'blur(24px)',
+          }}
           label="Command Palette"
         >
           {/* Search Input */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
-            <Search size={18} className="text-text-muted shrink-0" />
+          <div
+            className="flex items-center gap-3 px-5 py-4"
+            style={{ borderBottom: '0.5px solid var(--b1)' }}
+          >
+            <Search size={16} style={{ color: 'var(--t3)', flexShrink: 0 }} />
             <Command.Input 
               ref={inputRef}
               value={searchQuery}
               onValueChange={setSearchQuery}
-              className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted/40 focus:outline-none font-medium"
-              placeholder="Search modules, notes, snippets, KB..."
+              className="flex-1 bg-transparent text-sm placeholder:opacity-30 focus:outline-none font-medium"
+              style={{ color: 'var(--t1)', fontFamily: 'var(--font-sans)' }}
+              placeholder="Search modules, notes, snippets, KB…"
             />
-            {isSearching && <div className="w-3 h-3 border-2 border-accent-green/40 border-t-accent-green rounded-full animate-spin shrink-0" />}
-            <kbd className="hidden sm:flex items-center gap-1 text-[9px] font-black text-text-muted bg-background-tertiary border border-border px-2 py-1 rounded uppercase tracking-widest">
+            {isSearching && (
+              <div
+                className="w-3 h-3 border-2 rounded-full animate-spin shrink-0"
+                style={{ borderColor: 'var(--jade)/40', borderTopColor: 'var(--jade2)' }}
+              />
+            )}
+            <kbd
+              className="hidden sm:flex items-center text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded"
+              style={{ color: 'var(--t3)', background: 'var(--bg3)', border: '0.5px solid var(--b1)' }}
+            >
               ESC
             </kbd>
           </div>
 
-          <Command.List className="max-h-[380px] overflow-y-auto scrollbar-thin p-2">
-            <Command.Empty className="py-8 text-center text-text-muted text-xs font-bold uppercase tracking-widest opacity-40">
+          <Command.List className="max-h-[380px] overflow-y-auto p-2" style={{ scrollbarWidth: 'thin' }}>
+            <Command.Empty
+              className="py-8 text-center text-xs font-bold uppercase tracking-widest"
+              style={{ color: 'var(--t3)' }}
+            >
               No results found.
             </Command.Empty>
 
-            {/* Global content search results */}
+            {/* ── Content search results ────────────────────────────────── */}
             {contentResults.length > 0 && (
-              <Command.Group heading="Content" className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:text-accent-green [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2">
+              <Command.Group
+                heading="Content"
+                className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2"
+                style={{ '--heading-color': 'var(--jade2)' } as React.CSSProperties}
+              >
                 {contentResults.map(result => (
                   <Command.Item
                     key={`content-${result.id}`}
                     value={`content ${result.title} ${result.subtitle}`}
-                    onSelect={() => navigateTo(result.module)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer transition-colors data-[selected=true]:bg-accent-green/10 data-[selected=true]:text-accent-green text-text-muted hover:text-text-primary group"
+                    onSelect={() => openModule(result.moduleId)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer transition-colors group"
+                    style={{ color: 'var(--t2)' }}
                   >
-                    <result.icon size={14} className="shrink-0 opacity-60 group-data-[selected=true]:opacity-100" />
+                    <result.icon size={14} className="shrink-0 opacity-60" />
                     <span className="flex-1 font-bold text-xs truncate">{result.title}</span>
                     <span className="text-[8px] font-black uppercase tracking-widest opacity-40 shrink-0">{result.subtitle}</span>
                     <ArrowRight size={12} className="opacity-0 group-data-[selected=true]:opacity-60 transition-opacity shrink-0" />
@@ -157,80 +240,94 @@ const CommandPalette = () => {
               </Command.Group>
             )}
 
-            {/* Module Navigation */}
-            <Command.Group heading="Navigate" className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:text-text-muted [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2">
-              {modules.map(mod => (
-                <Command.Item
-                  key={mod.id}
-                  value={`${mod.label} ${mod.keywords}`}
-                  onSelect={() => navigateTo(mod.id)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer transition-colors data-[selected=true]:bg-accent-green/10 data-[selected=true]:text-accent-green text-text-muted hover:text-text-primary group"
-                >
-                  <mod.icon size={16} className="shrink-0 opacity-60 group-data-[selected=true]:opacity-100" />
-                  <span className="flex-1 font-bold text-xs uppercase tracking-wider">{mod.label}</span>
-                  <span className="text-[8px] font-black uppercase tracking-widest opacity-30">{mod.group}</span>
-                  <ArrowRight size={12} className="opacity-0 group-data-[selected=true]:opacity-60 transition-opacity" />
-                </Command.Item>
-              ))}
-            </Command.Group>
+            {/* ── Module navigation — grouped ───────────────────────────── */}
+            {Object.entries(grouped).map(([groupName, items]) => (
+              <Command.Group
+                key={groupName}
+                heading={groupName}
+                className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2"
+              >
+                {items.map(mod => (
+                  <Command.Item
+                    key={mod.id}
+                    value={`${mod.label} ${mod.keywords}`}
+                    onSelect={() => openModule(mod.id)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all group"
+                    style={{ color: 'var(--t2)' }}
+                  >
+                    <mod.icon size={15} className="shrink-0 opacity-50 group-data-[selected=true]:opacity-100" />
+                    <span className="flex-1 font-bold text-xs uppercase tracking-wider">{mod.label}</span>
+                    <ArrowRight size={11} className="opacity-0 group-data-[selected=true]:opacity-50 transition-opacity shrink-0" />
+                  </Command.Item>
+                ))}
+              </Command.Group>
+            ))}
 
-            {/* Workspace Switching */}
+            {/* ── Workspace switching ───────────────────────────────────── */}
             {workspaces.length > 1 && (
-              <Command.Group heading="Switch Workspace" className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:text-text-muted [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2">
+              <Command.Group
+                heading="Switch Workspace"
+                className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2"
+              >
                 {workspaces.map(ws => (
                   <Command.Item
                     key={ws.id}
                     value={`workspace ${ws.name}`}
                     onSelect={() => switchWorkspace(ws)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer transition-colors data-[selected=true]:bg-accent-blue/10 data-[selected=true]:text-accent-blue text-text-muted hover:text-text-primary group"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer group"
+                    style={{ color: 'var(--t2)' }}
                   >
-                    <div className="w-3 h-3 rounded-full shrink-0 border border-border" style={{ backgroundColor: ws.color }} />
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: ws.color, border: '0.5px solid var(--b2)' }} />
                     <span className="flex-1 font-bold text-xs uppercase tracking-wider">{ws.name}</span>
                     {activeWorkspace?.id === ws.id && (
-                      <span className="text-[8px] font-black text-accent-green uppercase tracking-widest">Active</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: 'var(--jade2)' }}>Active</span>
                     )}
                   </Command.Item>
                 ))}
               </Command.Group>
             )}
 
-            {/* System Actions */}
-            <Command.Group heading="System" className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:text-accent-red [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2">
+            {/* ── System Actions ─────────────────────────────────────────── */}
+            <Command.Group
+              heading="System"
+              className="[&_[cmdk-group-heading]]:text-[9px] [&_[cmdk-group-heading]]:font-black [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.2em] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2"
+            >
               <Command.Item
-                value="Erase System Data Reset Everything Refresh Database Removes Workspaces Profile"
+                value="Erase System Data Reset Everything Database Workspaces Profile"
                 onSelect={async () => {
-                  setIsOpen(false);
+                  closepalette();
                   if (confirm('CRITICAL: Reset everything? This will delete all local data and settings permanently.')) {
                     try {
-                      await (window as any).electron.db.resetAll();
-                    } catch (e) {
-                      console.error('Failed to reset DB:', e);
-                    }
-                    updateSettings({ isOnboarded: false }); 
+                      await (window as any).electron?.db?.resetAll();
+                    } catch { /* no-op in dev */ }
+                    updateSettings({ isOnboarded: false });
                     setTimeout(() => {
-                      localStorage.removeItem('kuro-storage'); // The store persist name is kuro-storage based on store.ts
+                      localStorage.removeItem('kuro-storage');
                       window.location.reload();
                     }, 150);
                   }
                 }}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer transition-colors data-[selected=true]:bg-accent-red/10 data-[selected=true]:text-accent-red text-text-muted hover:text-text-primary group"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer group"
+                style={{ color: 'var(--red)' }}
               >
-                <AlertCircle size={16} className="shrink-0 opacity-60 group-data-[selected=true]:opacity-100 text-accent-red" />
-                <span className="flex-1 font-bold text-xs uppercase tracking-wider text-accent-red">Erase System Data</span>
-                <span className="text-[8px] font-black uppercase tracking-widest opacity-30 text-accent-red">Danger</span>
-                <ArrowRight size={12} className="opacity-0 group-data-[selected=true]:opacity-60 transition-opacity" />
+                <AlertCircle size={15} className="shrink-0 opacity-70" />
+                <span className="flex-1 font-bold text-xs uppercase tracking-wider">Erase System Data</span>
+                <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Danger</span>
               </Command.Item>
             </Command.Group>
           </Command.List>
 
-          {/* Footer hint */}
-          <div className="px-4 py-2.5 border-t border-border flex items-center justify-between">
-            <div className="flex items-center gap-4 text-[9px] font-bold text-text-muted/40 uppercase tracking-widest">
+          {/* Footer */}
+          <div
+            className="px-4 py-2.5 flex items-center justify-between"
+            style={{ borderTop: '0.5px solid var(--b1)' }}
+          >
+            <div className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--t3)' }}>
               <span className="flex items-center gap-1"><CommandIcon size={10} /> + K to toggle</span>
               <span>↑↓ navigate</span>
-              <span>↵ select</span>
+              <span>↵ open window</span>
             </div>
-            <span className="text-[9px] text-text-muted/30 uppercase tracking-widest">
+            <span className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--t3)' }}>
               <FileSearch size={10} className="inline mr-1" />searches notes · snippets · KB
             </span>
           </div>

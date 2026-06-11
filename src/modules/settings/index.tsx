@@ -138,10 +138,10 @@ const Settings = () => {
         <p className="text-text-muted text-sm mt-1 uppercase tracking-widest font-black opacity-60">Global configuration & security</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 @lg:grid-cols-3 gap-8">
         
         {/* Left Col: Preferences & Security */}
-        <div className="lg:col-span-1 space-y-8">
+        <div className="@lg:col-span-1 space-y-8">
           {/* Security Section */}
           <div className="bg-background-secondary border border-border rounded-3xl p-6 shadow-xl">
             <div className="flex items-center gap-2 mb-6">
@@ -205,7 +205,7 @@ const Settings = () => {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Preferred Browser</label>
                 <select 
-                  className="w-full bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:border-accent-blue focus:outline-none transition-all cursor-pointer"
+                  className="w-full bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:outline-none transition-all cursor-pointer"
                   value={settings.preferredBrowser}
                   onChange={(e) => updateSettings({ preferredBrowser: e.target.value })}
                 >
@@ -279,7 +279,7 @@ const Settings = () => {
         </div>
 
         {/* Right Col: AI, Team, Shortcuts */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="@lg:col-span-2 space-y-8">
            <div className="bg-background-secondary border border-border rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
               {/* Background Glow */}
               <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent-blue/5 rounded-full blur-[100px] pointer-events-none" />
@@ -310,7 +310,7 @@ const Settings = () => {
                     <div className="relative">
                        <input 
                          type="password"
-                         className="w-full bg-background-primary border border-border rounded-2xl p-4 text-xs font-bold focus:border-accent-red focus:outline-none transition-all placeholder:text-text-muted/20"
+                         className="w-full bg-background-primary border border-border rounded-2xl p-4 text-xs font-bold focus:outline-none transition-all placeholder:text-text-muted/20"
                          placeholder="Enter your Groq API key..."
                          value={settings.groqKey || ''}
                          onChange={(e) => updateSettings({ groqKey: e.target.value })}
@@ -340,7 +340,7 @@ const Settings = () => {
                  </div>
 
                  {/* OpenAI & Anthropic (Future Proofing) */}
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
                     <div className="space-y-2 opacity-40">
                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">OpenAI Key (COMING SOON)</label>
                        <input 
@@ -374,7 +374,7 @@ const Settings = () => {
                   <p className="text-[10px] text-text-muted uppercase tracking-widest font-black opacity-60">Navigate faster</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 @md:grid-cols-2 gap-3">
                 {SHORTCUTS.map((shortcut, idx) => (
                   <div key={idx} className="flex items-center justify-between p-3 bg-background-primary border border-border rounded-xl">
                     <span className="text-xs font-medium text-text-primary">{shortcut.action}</span>
@@ -413,14 +413,14 @@ const Settings = () => {
               {/* Invite Form */}
               <div className="flex gap-3 mb-6">
                 <input 
-                  className="flex-1 bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:border-accent-blue focus:outline-none"
+                  className="flex-1 bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:outline-none"
                   placeholder="Email address to invite..."
                   value={inviteEmail}
                   onChange={e => setInviteEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleInviteMember()}
                 />
                 <select 
-                  className="bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:border-accent-blue focus:outline-none"
+                  className="bg-background-primary border border-border rounded-xl p-3 text-xs font-bold focus:outline-none"
                   value={inviteRole}
                   onChange={e => setInviteRole(e.target.value as 'admin' | 'member')}
                 >

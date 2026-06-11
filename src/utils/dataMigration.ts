@@ -165,7 +165,7 @@ export async function pullCloudData(userEmail: string, targetWorkspaceId?: strin
     // 1. Ensure at least one Workspace exists or use the targeted one
     let targetId = targetWorkspaceId;
     if (!targetId) {
-      let workspaces = await workspaceQueries.getAll();
+      const workspaces = await workspaceQueries.getAll();
       targetId = workspaces[0]?.id;
 
       if (!targetId) {

@@ -59,14 +59,14 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="ADD NEW INSTANCE">
+      <Modal isOpen={isOpen} onClose={onClose} title="ADD NEW INSTANCE" accent="copper">
         <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
           {/* ... existing fields ... */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Platform</label>
               <select 
-                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
                 value={formData.platform}
                 onChange={(e) => setFormData({...formData, platform: e.target.value})}
               >
@@ -78,7 +78,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Type</label>
               <select 
-                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+                className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
                 value={formData.type}
                 onChange={(e) => setFormData({...formData, type: e.target.value})}
               >
@@ -91,7 +91,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Instance Name</label>
             <input 
-              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
               placeholder="e.g. Production ERP"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -101,7 +101,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Instance URL</label>
             <input 
-              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
               placeholder="https://fa-xxxx.oraclecloud.com"
               value={formData.url}
               onChange={(e) => setFormData({...formData, url: e.target.value})}
@@ -112,7 +112,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
             <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Expiry Date (Optional)</label>
             <input 
               type="date"
-              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+              className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
               value={formData.expiryDate}
               onChange={(e) => setFormData({...formData, expiryDate: e.target.value})}
             />
@@ -128,7 +128,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
                   checked={formData.rememberPassword}
                   onChange={(e) => setFormData({...formData, rememberPassword: e.target.checked})}
                 />
-                <div className={`w-8 h-4 rounded-full transition-colors relative ${formData.rememberPassword ? 'bg-accent-green' : 'bg-background-tertiary'}`}>
+                <div className={`w-8 h-4 rounded-full transition-colors relative ${formData.rememberPassword ? 'bg-accent-blue' : 'bg-background-tertiary'}`}>
                   <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${formData.rememberPassword ? 'left-4.5' : 'left-0.5'}`} />
                 </div>
                 <span className="text-[10px] font-bold text-text-muted uppercase">Remember Password</span>
@@ -140,7 +140,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
                 <label className="text-[9px] font-bold text-text-muted uppercase tracking-widest">Username</label>
                 <input 
                   disabled={!formData.rememberPassword}
-                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
                   placeholder="e.g. john.doe@oracle.com"
                   value={formData.username}
                   onChange={(e) => setFormData({...formData, username: e.target.value})}
@@ -151,7 +151,7 @@ const InstanceForm: React.FC<InstanceFormProps> = ({ isOpen, onClose, onSuccess 
                 <input 
                   type="password"
                   disabled={!formData.rememberPassword}
-                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none"
+                  className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none"
                   placeholder="••••••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}

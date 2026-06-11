@@ -32,9 +32,9 @@ const MenuBar = ({ editor }: { editor: any }) => {
   );
 };
 
-const KnowledgeHub = () => {
+const KnowledgeHub = ({ defaultView = 'doc' }: { defaultView?: ViewType }) => {
   const { profile } = useAppStore();
-  const [activeView, setActiveView] = useState<ViewType>('doc');
+  const [activeView, setActiveView] = useState<ViewType>(defaultView);
   const [entries, setEntries] = useState<KnowledgeEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
@@ -159,7 +159,7 @@ const KnowledgeHub = () => {
   const navItems = [
     { id: 'doc', label: 'Articles', icon: Book, color: 'text-accent-green' },
     { id: 'term', label: 'Glossary', icon: Hash, color: 'text-accent-blue' },
-    { id: 'api', label: 'API Specs', icon: Plug, color: 'text-purple-400' },
+    { id: 'api', label: 'API Specs', icon: Plug, color: 'text-accent-violet' },
     { id: 'guide', label: 'Guides', icon: GraduationCap, color: 'text-amber-400' },
   ];
 
@@ -278,14 +278,14 @@ const KnowledgeHub = () => {
               )}
 
               {activeView === 'api' && (
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                  <div className="col-span-2 p-4 bg-background-tertiary border border-border rounded-card">
+                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-4 mb-8">
+                  <div className="col-span-1 @sm:col-span-2 p-4 bg-background-tertiary border border-border rounded-card">
                     <h4 className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-2">Endpoint</h4>
                     <code className="text-sm text-accent-blue font-mono">{activeEntry.metadata_json?.endpoint}</code>
                   </div>
                   <div className="p-4 bg-background-tertiary border border-border rounded-card text-center">
                     <h4 className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-2">Method</h4>
-                    <span className="text-lg font-black text-purple-400">{activeEntry.metadata_json?.method}</span>
+                    <span className="text-lg font-black text-accent-violet">{activeEntry.metadata_json?.method}</span>
                   </div>
                 </div>
               )}
@@ -319,8 +319,8 @@ const KnowledgeHub = () => {
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`MANAGE ${activeView.toUpperCase()}`}>
           <div className="space-y-4 max-h-[75vh] overflow-y-auto scrollbar-thin pr-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1 col-span-2">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
+              <div className="space-y-1 col-span-1 @sm:col-span-2">
                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Title</label>
                 <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
               </div>
@@ -338,25 +338,25 @@ const KnowledgeHub = () => {
               <div className="p-4 bg-background-tertiary rounded-standard border border-border space-y-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Term / Acronym</label>
-                  <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none" value={metaTerm} onChange={e => setMetaTerm(e.target.value)} />
+                  <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none" value={metaTerm} onChange={e => setMetaTerm(e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Short Definition</label>
-                  <textarea className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-blue focus:outline-none h-20" value={metaDefinition} onChange={e => setMetaDefinition(e.target.value)} />
+                  <textarea className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none h-20" value={metaDefinition} onChange={e => setMetaDefinition(e.target.value)} />
                 </div>
               </div>
             )}
 
             {activeView === 'api' && (
               <div className="p-4 bg-background-tertiary rounded-standard border border-border space-y-3">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-2 space-y-1">
+                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-3">
+                  <div className="col-span-1 @sm:col-span-2 space-y-1">
                     <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Base Endpoint</label>
-                    <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-purple-400 focus:outline-none" value={metaEndpoint} onChange={e => setMetaEndpoint(e.target.value)} />
+                    <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-violet focus:outline-none" value={metaEndpoint} onChange={e => setMetaEndpoint(e.target.value)} />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Method</label>
-                    <select className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-purple-400 focus:outline-none" value={metaMethod} onChange={e => setMetaMethod(e.target.value)}>
+                    <select className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-violet focus:outline-none" value={metaMethod} onChange={e => setMetaMethod(e.target.value)}>
                       <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option><option>PATCH</option>
                     </select>
                   </div>
@@ -377,7 +377,7 @@ const KnowledgeHub = () => {
               <input className="w-full bg-background-primary border border-border rounded-standard p-2 text-sm focus:border-accent-green focus:outline-none" value={newLinksStr} onChange={e => setNewLinksStr(e.target.value)} />
             </div>
 
-            <button onClick={handleSave} disabled={!newTitle} className="w-full btn-primary !bg-accent-green py-3 flex items-center justify-center gap-2 mt-4 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50">
+            <button onClick={handleSave} disabled={!newTitle} className="w-full btn-secondary py-3 flex items-center justify-center gap-2 mt-4 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50">
               <Save size={16} />
               <span>{editMode ? 'UPDATE HUB ENTRY' : 'PUBLISH TO HUB'}</span>
             </button>

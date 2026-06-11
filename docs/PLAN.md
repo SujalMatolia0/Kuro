@@ -231,6 +231,7 @@ known_issues      (id, team_id, title, platform, description, workaround, status
 | 4         | Knowledge Base + Reference Modules | Complete    | 100%   |
 | 5         | Permission Advisor + Error Decoder | Complete    | 100%   |
 | 6         | Settings + Polish + Build          | Complete    | 100%   |
+| 7         | Responsive Window Forms & Grids    | Complete    | 100%   |
 | **TOTAL** |                                    |             | **100%** |
 
 ---

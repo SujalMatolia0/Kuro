@@ -1,3 +1,23 @@
+# Kuro v0.1.1 - Release Notes
+
+## 🎉 What's New
+
+### 📱 Responsive Window Forms & Grids
+- **Container Queries Migration**: Converted all form grids and layout pages inside the Kuro OS desktop windows to use Tailwind v4 container queries (`@sm`, `@md`, `@lg`). This ensures grids adapt seamlessly as windows are drag-resized or positioned, replacing static browser-wide viewport queries.
+- **Improved Modal Scroll and Flow**: Wrapped input grids inside creation and editing modals with `@sm:grid-cols-2` and `@md:grid-cols-3` to prevent content squeezing and vertical clipping.
+- **Modules Updated**:
+  - **Guided Checklists**: Responsive platform/title input controls.
+  - **Knowledge Hub**: Stacked editor metadata fields and responsive API base endpoint queries.
+  - **Role Advisor**: Responsive platform and role type selector alignment.
+  - **Known Issues**: Stacking filters, responsive details grid, and creation forms.
+  - **Error Decoder**: Fluid query bar layout, side-by-side diagnosis cards, and responsive engine statistics grid.
+  - **Permission Advisor**: Responsive natural language search inputs and collaboration banner text.
+  - **System Settings**: Layout grid, API credentials input columns, and keyboard shortcut list cards.
+  - **Role Command Center**: Registry role cards grid auto-adjusts from single to triple columns.
+  - **Conflict Resolver**: Version comparison cards stacked layout on small window sizes.
+
+---
+
 # Kuro v0.1.0 - Release Notes
 
 ## 🎉 What's New

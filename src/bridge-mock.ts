@@ -1,7 +1,7 @@
 /**
- * Bridge Mock 
- * This file provides a fallback for window.electron APIs when running in a 
- * standard browser environment. This enables easier testing and development.
+ * Bridge Mock
+ * Provides fallback for window.electron APIs when running in browser.
+ * Also mocks Supabase auth for dev testing.
  */
 
 if (typeof window !== 'undefined' && !window.electron) {
@@ -10,17 +10,15 @@ if (typeof window !== 'undefined' && !window.electron) {
   const mockDb = {
     execute: async (sql: string, params: any[] = []) => {
       console.log(`[Mock DB] Executing: ${sql}`, params);
-      
-      // Basic mock implementation using localStorage
+
       const tableMatch = sql.match(/FROM\s+(\w+)/i) || sql.match(/INSERT\s+INTO\s+(\w+)/i) || sql.match(/UPDATE\s+(\w+)/i) || sql.match(/DELETE\s+FROM\s+(\w+)/i);
       const tableName = tableMatch ? tableMatch[1] : 'default';
       const storageKey = `mock_db_${tableName}`;
-      
+
       let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
       if (sql.startsWith('SELECT')) {
         if (sql.includes('WHERE')) {
-          // Very basic filter matching (id = ?)
           if (params.length > 0) {
             return data.filter((item: any) => Object.values(item).includes(params[0]));
           }
@@ -30,11 +28,18 @@ if (typeof window !== 'undefined' && !window.electron) {
 
       if (sql.startsWith('INSERT')) {
         const id = params[0];
-        // This is a naive mapping of params to objects for testing purposes
-        const newItem = { id, workspace_id: params[1], title: params[2], status: 'TODO' };
+        const newItem: any = { id };
+        const keys = ['id', 'workspace_id', 'title', 'name', 'color', 'url', 'platform', 'type', 'status', 'priority', 'body', 'group_name', 'code', 'language', 'tags'];
+        params.forEach((p: any, i: number) => {
+          if (keys[i]) newItem[keys[i]] = p;
+        });
         data.push(newItem);
         localStorage.setItem(storageKey, JSON.stringify(data));
         return { id };
+      }
+
+      if (sql.startsWith('UPDATE')) {
+        return { changes: 1 };
       }
 
       if (sql.startsWith('DELETE')) {
@@ -60,10 +65,25 @@ if (typeof window !== 'undefined' && !window.electron) {
     db: mockDb,
     safeStorage: mockSafeStorage,
     shell: mockShell,
+    net: {
+      checkStatus: async (url: string) => {
+        try {
+          await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    },
+    app: {
+      getDataPath: async () => '/mock/user-data',
+    },
     instance: {
       launchSecure: async () => console.log('[Mock] Secure Launch triggered'),
-    }
+    },
   };
+
+  console.log('[Dev Companion] Browser mock initialized.');
 }
 
 export {};

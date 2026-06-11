@@ -116,10 +116,10 @@ const AuditModule = () => {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'CREATE': return <Activity size={14} className="text-accent-green" />;
-      case 'UPDATE': return <RefreshCw size={14} className="text-blue-400" />;
+      case 'UPDATE': return <RefreshCw size={14} className="text-accent-blue" />;
       case 'DELETE': return <Activity size={14} className="text-accent-red" />;
-      case 'SYNC_PUSH': return <Send size={14} className="text-[#a855f7]" />;
-      case 'SYNC_PULL': return <Download size={14} className="text-amber-500" />;
+      case 'SYNC_PUSH': return <Send size={14} className="text-accent-violet" />;
+      case 'SYNC_PULL': return <Download size={14} className="text-accent-amber" />;
       default: return <Clock size={14} />;
     }
   };
